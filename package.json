@@ -1,0 +1,11 @@
+{
+  "name": "express-body-parser-backend",
+  "version": "1.0.0",
+  "description": "Create Project and Deploy Container",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nicholas Anthony Suhartono",
+  "license": "ISC"
+}
