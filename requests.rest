@@ -1,0 +1,27 @@
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+    "email" : "test1234df@mailinator.com",
+    "password" : "nicho1234"
+}
+
+################################
+POST http://localhost:3000/api/v1/auth/token
+Content-Type: application/json
+
+{
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibmljaG9sYXMiLCJlbWFpbCI6InRlc3QxMjM0ZGZAbWFpbGluYXRvci5jb20iLCJpZCI6IjYwMDI3YTJhM2U0MzBkYjJiYzJjNjQyYyIsImlhdCI6MTYxMDc4NDY4NH0.cLQmEA9U_jY8gsxo5zZtRNHT_vbPSxyIwdhZVetYEQs"
+}
+
+################################
+
+GET http://localhost:3000/api/v1/dashboard
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibmljaG9sYXMiLCJlbWFpbCI6InRlc3QxMjM0ZGZAbWFpbGluYXRvci5jb20iLCJpZCI6IjYwMDI3YTJhM2U0MzBkYjJiYzJjNjQyYyIsImlhdCI6MTYxMDc5ODg1NiwiZXhwIjoxNjExNDAzNjU2fQ.KVe8yIGn5Gd4AUzFvGm-uigvSF25pOy4-8A0FQwa4Ao
+
+
+{
+    "email" : "test1234df@mailinator.com",
+    "password" : "nicho1234"
+}
