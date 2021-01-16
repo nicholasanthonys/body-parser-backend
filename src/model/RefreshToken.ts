@@ -18,4 +18,4 @@ export interface IRefreshToken extends Document {
   date : Date
 }
 
-module.exports = mongoose.model<IRefreshToken>("RefreshToken", refreshTokenSchema);
+export const RefreshToken = mongoose.model<IRefreshToken>("RefreshToken", refreshTokenSchema);
