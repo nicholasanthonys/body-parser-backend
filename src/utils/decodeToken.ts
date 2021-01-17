@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jsonwebtoken from 'jsonwebtoken';
+import { IUser,User } from '../models/User';
 
 //* middleware to validate token
-const decodeToken = (req: Request): Object | null => {
+const decodeToken = (req: Request):  IUser | null => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
         // Example : Bearer kdjdkaidkwkk(this is the token). Split by space
@@ -11,7 +12,7 @@ const decodeToken = (req: Request): Object | null => {
             //* Decode the json web token, usually contain user payload
             const decoded = jsonwebtoken.verify(token, `${process.env.ACCESS_TOKEN_SECRET}`);
 
-            return decoded
+            return (decoded as IUser)
 
         } catch (err) {
             return null;
