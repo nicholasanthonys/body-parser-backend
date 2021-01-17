@@ -5,20 +5,17 @@ import { Project } from '../models/Project';
 import decodeToken from '../utils/decodeToken';
 const router = Router();
 router.post("/", async (req: Request, res: Response) => {
-    const { projectId, config, description } = req.body;
-    console.log("project id: ", projectId)
+    const { projectSlug, config, description } = req.body;
     const user = decodeToken(req);
     if (user) {
         //* Find project by id
-
-
         try {
-            const project = await Project.findOne({_id : projectId});
+            const project = await Project.findOne({slug : projectSlug});
             if (project) {
                 console.log("project is");
                 console.log(project);
                 const newConfigure = new Configure({
-                    projectId,
+                    projectId : project._id,
                     config,
                     description
 
@@ -47,9 +44,9 @@ router.put("/", async (req: Request, res: Response) => {
     }
 });
 
-router.delete("/:projectId", async (req: Request, res: Response) => {
+router.delete("/:projectSlug", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectId } = req.params;
+    const { projectSlug } = req.params;
     if (user) {
         // try {
         //     await Project.deleteOne({ userId: user.id, _id: projectId });
