@@ -62,14 +62,16 @@ router.get("/:projectSlug", async (req: Request, res: Response) => {
 
 
 // * Update a project
-router.put("/", async (req: Request, res: Response) => {
+router.put("/:projectId", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     const { name, description } = req.body;
+    const {projectId} = req.params;
     if (user) {
         try {
-            const projects = await Project.findOneAndUpdate({ userId: user.id }, { name, description }, {
+            const projects = await Project.findOneAndUpdate({ userId: user.id, _id : projectId }, { name, description }, {
                 new: true
             })
+            
 
             return res.status(200).send(projects);
         } catch (err) {
@@ -85,9 +87,17 @@ router.delete("/:projectSlug", async (req: Request, res: Response) => {
     const { projectSlug } = req.params;
     if (user) {
         try {
-            await Project.deleteOne({ userId: user.id, slug: projectSlug });
+            //* retrieve project from project slug: projectSlug 
+            const project = Project.findOne({ slug: projectSlug });
+            const projectId = project._id;
+            if (project) {
+                await project.deleteOne({ userId: user.id, slug: projectSlug });
+                //* Delete related configures 
+                await Configure.deleteMany({  projectId })
 
-            return res.status(204).send({ message: "Project has been deleted" });
+                return res.status(204).send({ message: "Project has been deleted" });
+            }
+
 
         } catch (err) {
             return res.status(400).send({ message: err.toString() });
