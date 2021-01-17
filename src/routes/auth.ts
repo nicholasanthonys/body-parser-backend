@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
 // const RefreshToken = require("../model/RefreshToken");
-import {RefreshToken} from '../model/RefreshToken' ;
+import {RefreshToken} from '../models/RefreshToken' ;
 import { Request, Response } from 'express';
-import { User, IUser } from '../model/User';
+import { User, IUser } from '../models/User';
 
 import bcrypt from 'bcrypt';
 import { registerValidation, loginValidation } from '../validation/validation';
