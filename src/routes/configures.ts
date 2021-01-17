@@ -31,9 +31,36 @@ router.post("/", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/", async (req: Request, res: Response) => {
-    const user = decodeToken(req);
 
+//* Get Specific Configure
+router.get("/", async (req: Request, res: Response) => {
+
+    const user = decodeToken(req);
+    const { projectSlug, configureId } = req.query;
+    if (user) {
+        try {
+            const project = await Project.findOne({ slug: projectSlug })
+            if (project) {
+                // cast to IProject
+
+                const configure = await Configure.findOne({ '_id': configureId?.toString() },'-_id');
+                if (configure) {
+                    return res.status(200).send({
+                  
+                        configure
+                    })
+                }
+                return res.status(400).send({
+                    message: "No Configure"
+                })
+
+            }
+            return res.status(400).send({ message: "No project found" });
+        } catch (error) {
+            return res.status(400).send({ message: error.message });
+        }
+
+    }
 });
 
 router.put("/", async (req: Request, res: Response) => {
