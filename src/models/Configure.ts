@@ -15,9 +15,17 @@ const fieldSchema  = new Schema({
     header: Schema.Types.Mixed,
     body: Schema.Types.Mixed,
     query: Schema.Types.Mixed
-}, {strict : false});
+}, {strict : false, _id : false, id :false});
 
-
+//* Remove _Id and _v from fieldSchema when returning to JSON
+fieldSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc : any, ret : any, options : any) => {
+        delete ret.__v;
+        delete ret._id;
+        delete ret.id;
+    },
+});
 
 export interface IDeleteField  extends Document {
     param: [String]
@@ -31,7 +39,18 @@ const fieldDeleteSchema  = new Schema({
     header:[String],
     body: [String],
     query: [String]
+} ,{_id : false, id :false});
+
+//* Remove _Id and _v from fieldDeleteSchema when returning to JSON
+fieldDeleteSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc : any, ret : any, options : any) => {
+        delete ret.__v;
+     
+        delete ret._id;
+    },
 });
+
 
 export interface ICommand  extends Document{
     destination_url: String,
@@ -78,6 +97,15 @@ const commandSchema = new Schema({
     adds : fieldSchema,
     modifies : fieldSchema,
     delete : fieldDeleteSchema
+},{_id : false, id :false});
+
+//* remove _id and _v from commandSchema when returning to JSON
+commandSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc : any, ret : any, options : any) => {
+        delete ret.__v;
+        delete ret._id;
+    },
 });
 
 
@@ -98,6 +126,15 @@ const configSchema = new Schema({
     },
 });
 
+//* Remove id and _v when returning to JSON
+configSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc : any, ret : any, options : any) => {
+        delete ret.__v;
+        delete ret._id;
+        delete ret.id;
+    },
+});
 
 export interface IConfigure extends Document {
     _id: string;
