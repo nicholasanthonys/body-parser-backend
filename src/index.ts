@@ -12,6 +12,7 @@ import validateToken from './middlewares/validate-token';
 import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
 import userRoute from './routes/user';
+import projectRoute from './routes/projects';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ const DB_CONNECT = process.env.DB_CONNECT;
 mongoose.connect(
   `${DB_CONNECT}`, // Use template string otherwise this will be error
   {
+    useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,
   },
@@ -54,9 +56,9 @@ app.use(`${prefixRoute}/auth`, authRoutes);
 app.use(validateToken);
 
 //* this route is protected with token
- app.use(`${prefixRoute}/dashboard`, dashboardRoutes);
+app.use(`${prefixRoute}/dashboard`, dashboardRoutes);
 app.use(`${prefixRoute}/user`, userRoute);
-
+app.use(`${prefixRoute}/project`,projectRoute);
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
