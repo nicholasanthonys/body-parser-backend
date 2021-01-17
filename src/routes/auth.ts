@@ -1,8 +1,9 @@
-import{Router} from 'express';
+import { Router } from 'express';
 
-const RefreshToken = require("../model/RefreshToken");
+// const RefreshToken = require("../model/RefreshToken");
+import {RefreshToken} from '../models/RefreshToken' ;
 import { Request, Response } from 'express';
-import { User, IUser } from '../model/User';
+import { User, IUser } from '../models/User';
 
 import bcrypt from 'bcrypt';
 import { registerValidation, loginValidation } from '../validation/validation';
@@ -10,12 +11,12 @@ import { registerValidation, loginValidation } from '../validation/validation';
 import jwt from 'jsonwebtoken';
 
 
-function generateAccessToken(name: String, email: String, id: String): String {
+function generateAccessToken(name: string, email: string, id: string, secret: string, expiresIn?: string | undefined): String {
   return jwt.sign(
     // payload data
     { name, email, id },
-    `${process.env.ACCESS_TOKEN_SECRET}`,
-    { expiresIn: "7d" }
+    secret,
+   expiresIn ? { expiresIn } : undefined
   );
 }
 
@@ -65,16 +66,16 @@ router.post("/login", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Password is wrong" });
 
 
-  // create token
-  const token: String = generateAccessToken(user.name, user.email, user._id);
+  // create access token
+  const accessToken: String = generateAccessToken(user.name, user.email, user._id, `${process.env.ACCESS_TOKEN_SECRET}`, `${process.env.ACCESS_TOKEN_LIFE}`);
 
-  const refreshToken = jwt.sign(
-    {
-      name: user.name,
-      email: user.email,
-      id: user._id,
-    },
-    `${process.env.REFRESH_TOKEN_SECRET}`
+  const refreshToken: String = generateAccessToken(
+
+    user.name,
+    user.email,
+    user._id,
+
+    `${process.env.REFRESH_TOKEN_SECRET}`, undefined
   );
 
 
@@ -82,36 +83,50 @@ router.post("/login", async (req: Request, res: Response) => {
     refreshToken,
   });
   try {
-    const savedNewRefreshToken = await newRefreshToken.save();
+    //* Save refresh token to database
+     await newRefreshToken.save();
   } catch (error) {
     return res.status(400).json({ msg: "failed to save refreshToken" });
   }
 
-  const response = { token, refreshToken };
+  const response = { accessToken, refreshToken };
 
   return res.status(200).json(response);
 });
 
 // To generate new token
-router.post("/token", async (req: Request, res: Response) => {
+router.post("/refresh", async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken;
+
   if (refreshToken == null) return res.sendStatus(401);
 
   // Get refresh Token
   let savedRefreshToken = await RefreshToken.findOne({ refreshToken: refreshToken })
+
   if (savedRefreshToken == null) return res.sendStatus(403);
 
   try {
+ 
     const decoded = await jwt.verify(savedRefreshToken.refreshToken, `${process.env.REFRESH_TOKEN_SECRET}`);
-    // console.log("verified is");
-    // console.log(verified);
-    // cast to InterfaceUser
+  
     let user = (decoded as IUser);
-    const token: String = generateAccessToken(user.name,user.email,user._id);
-    res.json({ user, token });
+    //* Generate new access token from refreshToken
+    const accessToken: String = generateAccessToken(user.name, user.email, user._id,`${process.env.ACCESS_TOKEN_SECRET}`,`${process.env.ACCESS_TOKEN_LIFE}`);
+    return res.status(200).send({ accessToken });
   } catch (err) {
-    res.status(403).json({ error: "Token is not valid" });
+    return res.status(403).send({ error: "Token is not valid" });
   }
 });
+
+
+router.delete("/delete", async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.body.refreshToken;
+    await RefreshToken.deleteOne({ refreshToken: refreshToken })
+    return res.send(204);
+  } catch (err) {
+    return res.send(204);
+  }
+})
 
 export default router
