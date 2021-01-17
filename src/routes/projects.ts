@@ -1,6 +1,6 @@
 
 import { Request, Response, Router } from 'express';
-import { Project,IProject } from '../models/Project';
+import { Project } from '../models/Project';
 import { Configure } from '../models/Configure';
 import decodeToken from '../utils/decodeToken';
 const router = Router();
@@ -38,41 +38,42 @@ router.get("/", async (req: Request, res: Response) => {
 //* Get project detail and its configures
 router.get("/:projectSlug", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const {projectSlug} = req.params ;
+    const { projectSlug } = req.params;
     if (user) {
         try {
-            const project = await Project.findOne({ slug:projectSlug })
-        if(project) {
-            // cast to IProject
+            const project = await Project.findOne({ slug: projectSlug })
+            if (project) {
+                // cast to IProject
 
-            const configures = await Configure.find({projectId : project._id }).select('_id');
-            return res.status(200).send({
-                project,
-                configures
-            })
-        }
-        return res.status(400).send({message : "No project found"});
+                const configures = await Configure.find({ projectId: project._id }).select('_id');
+                return res.status(200).send({
+                    project,
+                    configures
+                })
+            }
+            return res.status(400).send({ message: "No project found" });
         } catch (error) {
-            return res.status(400).send({message : error.message});
+            return res.status(400).send({ message: error.message });
         }
-        
+
     }
 });
+
 
 
 // * Update a project
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const {name,description} = req.body;
+    const { name, description } = req.body;
     if (user) {
-        try{
-            const projects = await Project.findOneAndUpdate({ userId: user.id },{name,description} ,{
-                new : true
+        try {
+            const projects = await Project.findOneAndUpdate({ userId: user.id }, { name, description }, {
+                new: true
             })
-    
+
             return res.status(200).send(projects);
-        }catch (err) {
-            return res.status(400).send({message : err.message});
+        } catch (err) {
+            return res.status(400).send({ message: err.message });
         }
 
     }
