@@ -17,7 +17,7 @@ router.post("/", async (req: Request, res: Response) => {
             await newProject.save();
             return res.status(200).send(newProject);
         } catch (err) {
-            return res.send(400).send(err);
+            return res.send(400).send(err.message);
         }
     }
 });
@@ -58,7 +58,7 @@ router.delete("/:projectId", async (req: Request, res: Response) => {
             return res.status(204).send({ message: "Project has been deleted" });
 
         } catch (err) {
-            return res.status(400).send({ message: err.toString() });
+            return res.status(400).send({ message: err.message() });
         }
     }
 });
