@@ -29,7 +29,8 @@ router.post("/", async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     if (user) {
-        const projects = await Project.find({ userId: user.id }).select('-configures');
+        //* Get project without its configures, and sort by date (newest or descending)
+        const projects = await Project.find({ userId: user.id }).sort('-date').select('-configures');
 
         return res.status(200).send(projects);
     }
@@ -71,8 +72,6 @@ router.put("/:projectId", async (req: Request, res: Response) => {
             const projects = await Project.findOneAndUpdate({ userId: user.id, _id : projectId }, { name, description }, {
                 new: true
             })
-            
-
             return res.status(200).send(projects);
         } catch (err) {
             return res.status(400).send({ message: err.message });
