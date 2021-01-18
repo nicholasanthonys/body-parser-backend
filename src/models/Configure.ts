@@ -145,11 +145,7 @@ export interface IConfigure extends Document {
 }
 
 
-const configureSchema = new Schema({
-    projectId: {
-        type: Schema.Types.ObjectId,
-        required: true
-    },
+export const configureSchema = new Schema({
     config: {
         type: configSchema,
         required: true
