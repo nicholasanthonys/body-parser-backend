@@ -30,7 +30,7 @@ router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     if (user) {
         //* Get project without its configures, and sort by date (newest or descending)
-        const projects = await Project.find({ userId: user.id }).sort('-date').select('-configures');
+        const projects = await Project.find({ userId: user.id }).sort({date : "desc"}).select('-configures');
 
         return res.status(200).send(projects);
     }
@@ -40,16 +40,17 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/:projectSlug", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     const { projectSlug } = req.params;
+
     if (user) {
         try {
             const project = await Project.findOne({ slug: projectSlug })
             if (project) {
                 // cast to IProject
 
-                const configures = await Configure.find({ projectId: project._id }).select('_id');
+           
                 return res.status(200).send({
                     project,
-                    configures
+             
                 })
             }
             return res.status(400).send({ message: "No project found" });
