@@ -71,7 +71,7 @@ router.put("/", async (req: Request, res: Response) => {
             if (index >= 0) {
                 project.configures[index] = configure
                 await project.save();
-                return res.status(200).send({ "message": "Configure updated" });
+                return res.status(200).send(project);
             }
             return res.status(400).send({ "message": "Configure not found" });
 
