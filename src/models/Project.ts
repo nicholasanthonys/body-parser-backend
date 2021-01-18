@@ -1,5 +1,6 @@
 import { Schema, Document, model, plugin } from 'mongoose';
 import { IUser } from './User';
+import {configureSchema,IConfigure} from './Configure';
 
 var slug = require('mongoose-slug-updater');
 
@@ -10,7 +11,8 @@ export interface IProject extends Document {
     userId: IUser['_id']
     name: string;
     description: string;
-    date: Date
+    date: Date,
+    configures : Array<IConfigure>
 }
 
 const projectShema = new Schema({
@@ -34,6 +36,10 @@ const projectShema = new Schema({
     description: {
         type: String,
         required: false
+    },
+    configures :{
+        type : [configureSchema],
+        default : [],
     },
     date: {
         type: Date,
