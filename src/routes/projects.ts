@@ -29,7 +29,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     if (user) {
-        const projects = await Project.find({ userId: user.id })
+        const projects = await Project.find({ userId: user.id }).select('-configures');
 
         return res.status(200).send(projects);
     }
