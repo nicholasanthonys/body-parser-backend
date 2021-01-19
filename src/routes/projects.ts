@@ -1,6 +1,6 @@
 
 import { Request, Response, Router } from 'express';
-import { Project } from '../models/Project';
+import { Project,IProject } from '../models/Project';
 import decodeToken from '../utils/decodeToken';
 const router = Router();
 router.post("/", async (req: Request, res: Response) => {
@@ -31,21 +31,25 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
+
+
+// * Update a project
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const {name,description} = req.body;
-    if (user) {
-        try{
-            const projects = await Project.findOneAndUpdate({ userId: user.id },{name,description} ,{
-                new : true
-            })
-    
-            return res.status(200).send(projects);
-        }catch (err) {
-            return res.status(400).send({message : err.message});
-        }
+    const {project}  = req.body ;
 
+    if (user) {
+        try {
+            const updatedProject = await Project.findOneAndUpdate({ userId: user.id, slug : project.slug }, project, {
+                new: true
+            })
+
+            return res.status(200).send(updatedProject);
+        } catch (err) {
+            return res.status(400).send({ message: err.message });
+        }
     }
+    return res.status(403).send({message : "Not authenticated"})
 });
 
 router.delete("/:projectId", async (req: Request, res: Response) => {
