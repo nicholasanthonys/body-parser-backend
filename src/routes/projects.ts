@@ -66,16 +66,15 @@ router.get("/:projectSlug", async (req: Request, res: Response) => {
 // * Update a project
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const project = req.body;
+    const {project} = req.body;
     
     if (user) {
         try {
             const updatedProject = await Project.findOneAndUpdate({ userId: user.id, slug : project.slug }, project, {
                 new: true
             })
-            console.log("projects is");
-            console.log(updatedProject);
-            return res.status(200).send(updatedProject);
+           
+            return res.status(200).send({project : updatedProject});
         } catch (err) {
             return res.status(400).send({ message: err.message });
         }
