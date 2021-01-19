@@ -1,6 +1,7 @@
 import { Schema, Document, model, plugin } from 'mongoose';
 import { IUser } from './User';
 import {configureSchema,IConfigure} from './Configure';
+import {finalResponseSchema} from './Response'
 
 var slug = require('mongoose-slug-updater');
 
@@ -40,6 +41,12 @@ const projectShema = new Schema({
     configures :{
         type : [configureSchema],
         default : [],
+        required : false,
+    },
+    finalResponse : {
+        type : finalResponseSchema,
+        default : null,
+        required : false
     },
     date: {
         type: Date,
