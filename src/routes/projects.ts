@@ -20,7 +20,7 @@ router.post("/", async (req: Request, res: Response) => {
             await newProject.save();
             return res.status(200).send(newProject);
         } catch (err) {
-            return res.send(400).send(err);
+            return res.send(400).send(err.message);
         }
     }
 });
@@ -77,8 +77,8 @@ router.put("/:projectId", async (req: Request, res: Response) => {
         } catch (err) {
             return res.status(400).send({ message: err.message });
         }
-
     }
+    return res.status(403).send({message : "Not authenticated"})
 });
 
 //* Delete a project
@@ -100,7 +100,7 @@ router.delete("/:projectSlug", async (req: Request, res: Response) => {
 
 
         } catch (err) {
-            return res.status(400).send({ message: err.toString() });
+            return res.status(400).send({ message: err.message() });
         }
     }
 });
