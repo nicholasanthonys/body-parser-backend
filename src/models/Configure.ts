@@ -53,6 +53,15 @@ fieldDeleteSchema.set('toJSON', {
 
 
 export interface ICommand  extends Document{
+    transform: String,
+    log_before_modify: String,
+    log_after_modify: String,
+    adds: IField,
+    modifies: IField,
+    deletes : IDeleteField
+}
+
+export interface ICommandRequest extends ICommand {
     destination_url: String,
     destination_path: String,
     method: String,
@@ -64,7 +73,9 @@ export interface ICommand  extends Document{
     deletes : IDeleteField
 }
 
-const commandSchema = new Schema({
+
+
+export const commandSchema = new Schema({
     destination_url: {
         type: String,
         required: false,
@@ -111,14 +122,14 @@ commandSchema.set('toJSON', {
 
 
 export interface IConfig extends Document {
-    Request: ICommand,
+    Request: ICommandRequest,
     Response: ICommand
 }
 
 const configSchema = new Schema({
     request: {
         type: commandSchema,
-        required: true
+        required: false
     },
     response: {
         type: commandSchema,

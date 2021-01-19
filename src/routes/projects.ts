@@ -7,20 +7,23 @@ const router = Router();
 
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
-    const { name, description } = req.body;
+    const { name, description,configures, finalResponse } = req.body;
     const user = decodeToken(req);
+
     if (user) {
         const newProject = new Project({
             userId: user.id,
             name,
-            description
+            description,
+            configures,
+            finalResponse 
         });
 
         try {
-            await newProject.save();
+            await newProject.save({checkKeys : false}); //* Set check keys = false in order to insert key with ($) or (.)
             return res.status(200).send(newProject);
         } catch (err) {
-            return res.send(400).send(err.message);
+            return res.status(400).send(err.message);
         }
     }
 });
