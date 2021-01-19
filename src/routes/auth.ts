@@ -57,10 +57,12 @@ router.post("/login", async (req: Request, res: Response) => {
   const { error } = loginValidation(req.body);
   // throw validation errors
   if (error) return res.status(400).json({ error: error.details[0].message });
-  const user: IUser | null = await User.findOne({ email: req.body.email });
+  const user: IUser | null = await User.findOne({ email: req.body.email }).select("+password");
+
   // throw error when email is wrong
   if (!user) return res.status(400).json({ error: "Email is wrong" });
-  // check for password correctness
+  // check for password correctness;
+
   const validPassword = await bcrypt.compare(req.body.password, user.password);
   if (!validPassword)
     return res.status(400).json({ error: "Password is wrong" });

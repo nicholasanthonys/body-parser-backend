@@ -13,7 +13,9 @@ import authRoutes from './routes/auth';
 import dashboardRoutes from './routes/dashboard';
 import userRoute from './routes/user';
 import projectRoute from './routes/projects';
+import configureRoute from './routes/configures';
 
+//* load environment variable
 dotenv.config();
 
 //* Get Port from env
@@ -29,6 +31,7 @@ mongoose.connect(
     useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex : true,
   },
   () => console.log("connected to db")
 );
@@ -59,6 +62,8 @@ app.use(validateToken);
 app.use(`${prefixRoute}/dashboard`, dashboardRoutes);
 app.use(`${prefixRoute}/user`, userRoute);
 app.use(`${prefixRoute}/project`,projectRoute);
+app.use(`${prefixRoute}/configure`,configureRoute);
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
