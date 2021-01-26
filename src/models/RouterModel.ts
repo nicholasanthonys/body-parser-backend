@@ -31,4 +31,15 @@ export const routerSchema = new Schema({
 });
 
 
+//* Remove _Id and _v from routerSchema when returning to JSON
+routerSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc : any, ret : any, options : any) => {
+        delete ret.__v;
+        delete ret._id;
+        delete ret.id;
+    },
+});
+
+
 export const RouterModel = model<IRouterModel>('RouterModel', routerSchema);
