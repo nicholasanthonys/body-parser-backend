@@ -1,8 +1,8 @@
 
 import { Request, Response, Router } from 'express';
-import { Project } from '../models/Project';
-import { Configure } from '../models/Configure';
-import decodeToken from '../utils/decodeToken';
+import { Project } from 'src/models/Project';
+import { Configure } from 'src/models/Configure';
+import decodeToken from 'src/utils/decodeToken';
 const router = Router();
 
 //* Store a project
