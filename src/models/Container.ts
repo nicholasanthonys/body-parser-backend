@@ -14,7 +14,7 @@ export interface IContainer extends Document {
     slug : string,
     status : string,
     description: string;
-    projectId :Array<IProject['_id']>
+    projectIds :Array<IProject['_id']>
     routers: [IRouterModel],
     date: Date,
  
