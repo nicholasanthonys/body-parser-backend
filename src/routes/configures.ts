@@ -38,7 +38,8 @@ router.get("/", async (req: Request, res: Response) => {
     const { projectSlug, configureId } = req.query;
     if (user) {
         try {
-            const project = await Project.findOne({ slug: projectSlug }) as IProject
+            let strProjectSlug = String(projectSlug);
+            const project = await Project.findOne({ slug: strProjectSlug }) as IProject
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
 
@@ -63,7 +64,7 @@ router.put("/", async (req: Request, res: Response) => {
     const configure = req.body
     if (user) {
         try {
-            const project = await Project.findOne({ slug: projectSlug }) as IProject
+            const project = await Project.findOne({ slug: String(projectSlug)   }) as IProject
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
                 if (index >= 0) {
@@ -89,7 +90,8 @@ router.delete("/", async (req: Request, res: Response) => {
     const { projectSlug, configureId } = req.query;
     if (user) {
         try {
-            const project = await Project.findOne({ slug: projectSlug }) as IProject;
+            let strProjectSlug = String(projectSlug);
+            const project = await Project.findOne({ slug: strProjectSlug }) as IProject;
             if (project) {
                 project.configures = project.configures.filter((element) => element._id != configureId)
                 await project.save();
