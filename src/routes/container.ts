@@ -13,26 +13,28 @@ let docker: Docker = new Docker({ socketPath: "/var/run/docker.sock" });
 //* Store a container
 router.post("/", async (req: Request, res: Response) => {
 
-    const { name, description, projectIds, routers, port } = req.body;
+    const { name, description, projectIds, routers, } = req.body;
     const user = decodeToken(req);
 
+    // return res.send(projectIds);
     if (user) {
-        if (!port) {
-            return res.status(400).send({
-                "message": "No port specified"
-            })
-        }
+        // if (!port) {
+        //     return res.status(400).send({
+        //         "message": "No port specified"
+        //     })
+        // }
 
-        //* Check if port is already occupied
-        const isPortOccupied = await Port.findOne({ port: port })
+        // //* Check if port is already occupied
+        // const isPortOccupied = await Port.findOne({ port: port })
 
-        if (isPortOccupied) {
-            return res.status(400).send({
-                "message": "Port already occupied"
-            });
-        }
+        // if (isPortOccupied) {
+        //     return res.status(400).send({
+        //         "message": "Port already occupied"
+        //     });
+        // }
 
-
+        //TODO : Setting port proxy for docker container. For now set default port
+        let port = 80
 
         let DBcontainerId: string | null = null;
         try {
@@ -89,7 +91,9 @@ router.post("/", async (req: Request, res: Response) => {
             // * Update containerId
             newDBContainer.containerId = v4();
             await newDBContainer.save()
-            await newDockercontainer.start();
+
+            //* Dont auto start
+            // await newDockercontainer.start();
             return res.status(200).send(newDBContainer);
         } catch (err) {
 
@@ -129,20 +133,22 @@ router.get("/:containerSlug", async (req: Request, res: Response) => {
             if (container) {
 
                 const projects = await Project.find({
-                    '_id' : {$in : container.projectIds}
+                    '_id': { $in: container.projectIds }
                 }).select(['-configures', '-finalResponse'])
-                
-                
+
+                let temp = {
+                    id: container.id,
+                    containerId: container.containerId,
+                    slug: container.slug,
+                    name: container.name,
+                    status: container.status,
+                    description: container.description,
+                    routers: container.routers,
+                    projects: projects,
+                }
                 return res.status(200).send({
-                    id : container.id,
-                    containerId : container.containerId,
-                    slug : container.slug,
-                    name : container.name,
-                    status : container.status,
-                    description : container.description,
-                    routers : container.routers,
-                    projects : projects,
-         
+                    container: temp
+
                 })
             }
             return res.status(400).send({ message: "No container found" });
@@ -159,6 +165,48 @@ router.get("/:containerSlug", async (req: Request, res: Response) => {
 
 // * Update a container
 router.put("/", async (req: Request, res: Response) => {
+    try {
+        const user = decodeToken(req);
+
+        if (user) {
+            const { status, projectIds, name, description, routers, slug } = req.body;
+
+            // return res.send({
+            //     id : user?.id,
+            //     slug
+            // })
+
+            const updatedContainer = await ContainerModel.findOneAndUpdate({ userId: user.id, slug: slug }, {
+                projectIds,
+                name, description,
+                routers
+
+            }, {
+                new: true
+            });
+
+            const projects = await Project.find({
+                '_id': { $in: updatedContainer.projectIds }
+            }).select(['-configures', '-finalResponse'])
+
+            let temp = {
+                id: updatedContainer.id,
+                containerId: updatedContainer.containerId,
+                slug: updatedContainer.slug,
+                name: updatedContainer.name,
+                status: updatedContainer.status,
+                description: updatedContainer.description,
+                routers: updatedContainer.routers,
+                projects: projects,
+            }
+
+            return res.status(200).send({ container: temp });
+        }
+
+
+    } catch (error) {
+        return res.status(400).send({ message: error.message });
+    }
 
 });
 
