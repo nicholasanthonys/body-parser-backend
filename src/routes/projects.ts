@@ -48,7 +48,7 @@ router.get("/:projectSlug", async (req: Request, res: Response) => {
         try {
             const project = await Project.findOne({ slug: projectSlug })
             if (project) {
-                // cast to IProject
+              
 
            
                 return res.status(200).send({
