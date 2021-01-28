@@ -52,7 +52,8 @@ router.post("/", async (req: Request, res: Response) => {
             let newDBContainer = await newDbContainer.save();
 
             DBcontainerId = newDBContainer._id
-
+            console.log("db containe rid is");
+            console.log(DBcontainerId);
             //* port is where the image application running and exposed its port
             let ExposedPorts: { [port: string]: {} } = {}
             ExposedPorts[String(port) + "/tcp"] = {}
@@ -66,7 +67,7 @@ router.post("/", async (req: Request, res: Response) => {
                 },
             ]
             //* actually creating docker container
-            let newDockercontainer: Container = await docker.createContainer(
+            await docker.createContainer(
                 {
                     Image: "go-body-parser:1.0",
                     Cmd: ["./build/Golang-Body-Parser"],
@@ -86,25 +87,30 @@ router.post("/", async (req: Request, res: Response) => {
                         ],
                     },
                 },
-            )
+            ).then(async (container) => {
+                // * Update containerId
+                newDBContainer.containerId = container.id;
+                await newDBContainer.save()
+            })
+                .catch(async (error) => {
+                    console.log("error is");
+                    console.log(error);
+                    console.log(DBcontainerId);
+                    //* Delete container from database.
+                    //* We need to find container from containerId 
+                    if (DBcontainerId) {
+                        await ContainerModel.deleteOne({ _id: DBcontainerId });
+                    }
 
-            // * Update containerId
-            newDBContainer.containerId = v4();
-            await newDBContainer.save()
+                    return res.status(400).send(error)
+                })
+
+
 
             //* Dont auto start
             // await newDockercontainer.start();
             return res.status(200).send(newDBContainer);
         } catch (err) {
-
-            console.log("error is");
-            console.log(err);
-            //* Delete container from database.
-            //* We need to find container from containerId 
-            if (DBcontainerId) {
-                ContainerModel.findOneAndDelete({ id: DBcontainerId });
-            }
-
 
             return res.status(400).send(err);
         }
@@ -211,7 +217,40 @@ router.put("/", async (req: Request, res: Response) => {
 });
 
 //* Delete a container
-router.delete("/", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    const user = decodeToken(req);
+    if (user) {
+        try {
+            //* Find user related container 
+            const containerModel = await ContainerModel.findOne({ _id: id, userId: user.id }) as IContainer;
+
+            // console.log("container model is");
+            // console.log(containerModel);
+            if (containerModel) {
+
+                let container = docker.getContainer(containerModel.containerId)
+                //* Remove from docker
+                container.remove(async (err, data) => {
+                    if (err) {
+                        return res.status(400).send({ message: err });
+                    } else {
+                        // * Remove from database
+                        await ContainerModel.deleteOne({ _id: id });
+                        return res.status(204);
+                    }
+                })
+            }
+
+        } catch (error) {
+            return res.status(400).send({ message: error })
+        }
+
+
+
+
+    }
 
 });
 
