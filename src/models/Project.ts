@@ -3,16 +3,13 @@ import { IUser } from './User';
 import {configureSchema,IConfigure} from './Configure';
 import {finalResponseSchema} from './Response'
 
-//* this package hasn't support typescript
-var slug = require('mongoose-slug-updater');
 
-//* initialize slug
-plugin(slug);
+
+
 export interface IProject extends Document {
     _id: string;
     userId: IUser['_id']
     name: string;
-    slug : string,
     description: string;
     date: Date,
     configures : Array<IConfigure>
@@ -30,11 +27,6 @@ const projectSchema = new Schema({
         required: true,
         min: 6,
         max: 255,
-    },
-    slug: { 
-        type: String, 
-        slug: "name" ,
-        unique : true,
     },
     description: {
         type: String,
@@ -56,6 +48,13 @@ const projectSchema = new Schema({
     },
 });
 
+projectSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc: any, ret: any, options: any) => {
+        delete ret.__v;
+        delete ret._id;
+    },
+});
 
 export const Project = model<IProject>('Project', projectSchema);
 Object.seal(Project);

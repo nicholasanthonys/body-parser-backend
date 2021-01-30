@@ -41,13 +41,13 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 //* Get project detail and its configures
-router.get("/:projectSlug", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectSlug } = req.params;
+    const { id } = req.params;
 
     if (user) {
         try {
-            const project = await Project.findOne({ slug: projectSlug });
+            const project = await Project.findById(id);
             if (project) {
                 return res.status(200).send({
                     project,
@@ -64,11 +64,10 @@ router.get("/:projectSlug", async (req: Request, res: Response) => {
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     const { project } = req.body;
-
     if (user) {
         try {
             const updatedProject = await Project.findOneAndUpdate(
-                { userId: user.id, slug: project.slug },
+                { userId: user.id, _id: project.id },
                 project,
                 {
                     new: true,
@@ -84,25 +83,29 @@ router.put("/", async (req: Request, res: Response) => {
 });
 
 //* Delete a project
-router.delete("/:projectSlug", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request, res: Response) => {
+
     const user = decodeToken(req);
-    const { projectSlug } = req.params;
+    const { id } = req.params;
     if (user) {
         try {
-            //* retrieve project from project slug: projectSlug
-            const project = Project.findOne({ slug: projectSlug });
+            //* retrieve project by id
+            const project = Project.findById(id);
             const projectId = project._id;
             if (project) {
-                await project.deleteOne({ userId: user.id, slug: projectSlug });
+                await project.deleteOne({ userId: user.id, id });
                 //* Delete related configures
                 await Configure.deleteMany({ projectId });
 
-                return res.status(204).send({ message: "Project has been deleted" });
+                return res.status(200).send({ message: "Project has been deleted" });
             }
+            return res.status(400).send({ message: "Project not found" });
+
         } catch (err) {
             return res.status(400).send({ message: err.message() });
         }
     }
+    return res.status(403);
 });
 
 export default router;

@@ -5,12 +5,12 @@ import { IProject, Project } from '../models/Project';
 import decodeToken from '../utils/decodeToken';
 const router = Router();
 router.post("/", async (req: Request, res: Response) => {
-    const { projectSlug, config, description } = req.body;
+    const { projectId, config, description } = req.body;
     const user = decodeToken(req);
     if (user) {
         //* Find project by id
         try {
-            const project = await Project.findOne({ slug: projectSlug }) as IProject;
+            const project = await Project.findById(projectId) as IProject;
             if (project) {
                 const newConfigure = new Configure({
                     config,
@@ -35,11 +35,11 @@ router.post("/", async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
 
     const user = decodeToken(req);
-    const { projectSlug, configureId } = req.query;
+    const { projectId, configureId } = req.query;
     if (user) {
         try {
-            let strProjectSlug = String(projectSlug);
-            const project = await Project.findOne({ slug: strProjectSlug }) as IProject
+          
+            const project = await Project.findById( projectId) as IProject
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
 
@@ -60,11 +60,11 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectSlug, configureId } = req.query;
+    const { projectId, configureId } = req.query;
     const configure = req.body
     if (user) {
         try {
-            const project = await Project.findOne({ slug: String(projectSlug)   }) as IProject
+            const project = await Project.findById(projectId) as IProject
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
                 if (index >= 0) {
@@ -87,11 +87,10 @@ router.put("/", async (req: Request, res: Response) => {
 
 router.delete("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectSlug, configureId } = req.query;
+    const { projectId, configureId } = req.query;
     if (user) {
         try {
-            let strProjectSlug = String(projectSlug);
-            const project = await Project.findOne({ slug: strProjectSlug }) as IProject;
+            const project = await Project.findById(projectId) as IProject;
             if (project) {
                 project.configures = project.configures.filter((element) => element._id != configureId)
                 await project.save();
