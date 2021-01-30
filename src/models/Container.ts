@@ -1,27 +1,26 @@
-import { Schema, Document, model, plugin } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 import {IUser} from './User';
 import {IProject} from './Project';
 import {IRouterModel, routerSchema} from './RouterModel';
+import { boolean } from 'joi';
 
-//* this package hasn't support typescript
-var slug = require('mongoose-slug-updater');
+
 
 export interface IContainer extends Document {
     _id: string;
     userId : IUser['_id']
     containerId: string,
     name: string;
-    slug : string,
     status : string,
     description: string;
     projectIds :Array<IProject['_id']>
     routers: [IRouterModel],
+    isContainerCreated : Boolean
     date: Date,
  
 }
 
-//* initialize slug
-plugin(slug);
+
 
 const containerSchema = new Schema({
     userId: {
@@ -31,15 +30,11 @@ const containerSchema = new Schema({
     containerId: {
         type: String,
         required : false,
+        default : null
     },
     name: { 
         type: String,
         required : true, 
-    },
-    slug: { 
-        type: String, 
-        slug: "name" ,
-        unique : true,
     },
     status: { 
         type: String, 
@@ -56,12 +51,25 @@ const containerSchema = new Schema({
         type : [routerSchema],
         required : false,
     },
+    isContainerCreated : {
+        type : Boolean,
+        required : false,
+        default: false,  
+    },
     date: {
         type: Date,
         default: Date.now,
     },
 });
 
+
+containerSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc: any, ret: any, options: any) => {
+        delete ret.__v;
+        delete ret._id;
+    },
+});
 
 export const Container = model<IContainer>('Container', containerSchema);
 Object.seal(Container);

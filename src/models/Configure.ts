@@ -46,7 +46,6 @@ fieldDeleteSchema.set('toJSON', {
     virtuals: true,
     transform: (doc : any, ret : any, options : any) => {
         delete ret.__v;
-     
         delete ret._id;
     },
 });
@@ -170,5 +169,12 @@ export const configureSchema = new Schema({
         default: Date.now,
     },
 });
+
+configureSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc: any, ret: any, options: any) => {
+        delete ret.__v;
+    },
+})
 
 export const Configure = model<IConfigure>('Configure', configureSchema);

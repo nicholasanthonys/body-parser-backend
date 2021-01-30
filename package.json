@@ -38,7 +38,6 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.12",
-    "mongoose-slug-updater": "^3.2.3",
     "tsconfig-paths": "^3.9.0",
     "uuid": "^8.3.2"
   },
