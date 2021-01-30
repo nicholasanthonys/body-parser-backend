@@ -3,9 +3,22 @@
   "version": "1.0.0",
   "description": "Create Project and Deploy Container",
   "main": "index.ts",
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/index.ts",
+    "ext": "ts, js"
+  },
   "scripts": {
     "start": "node build/index.js",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon",
     "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,16 +26,21 @@
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/dockerode": "^3.2.2",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.10.3",
+    "@types/uuid": "^8.3.0",
     "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
+    "dockerode": "^3.2.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.12",
-    "mongoose-slug-updater": "^3.2.3"
+    "mongoose-slug-updater": "^3.2.3",
+    "tsconfig-paths": "^3.9.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.9",

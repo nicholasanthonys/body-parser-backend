@@ -121,7 +121,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
 });
 
 
-router.delete("/delete", async (req: Request, res: Response) => {
+router.delete("/logout", async (req: Request, res: Response) => {
   try {
     const refreshToken = req.body.refreshToken;
     await RefreshToken.deleteOne({ refreshToken: refreshToken })

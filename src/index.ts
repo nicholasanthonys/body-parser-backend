@@ -14,6 +14,7 @@ import dashboardRoutes from './routes/dashboard';
 import userRoute from './routes/user';
 import projectRoute from './routes/projects';
 import configureRoute from './routes/configures';
+import containerRoute from './routes/container';
 
 //* load environment variable
 dotenv.config();
@@ -63,6 +64,7 @@ app.use(`${prefixRoute}/dashboard`, dashboardRoutes);
 app.use(`${prefixRoute}/user`, userRoute);
 app.use(`${prefixRoute}/project`,projectRoute);
 app.use(`${prefixRoute}/configure`,configureRoute);
+app.use(`${prefixRoute}/container`,containerRoute);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

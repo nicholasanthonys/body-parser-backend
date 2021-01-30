@@ -3,6 +3,7 @@ import { IUser } from './User';
 import {configureSchema,IConfigure} from './Configure';
 import {finalResponseSchema} from './Response'
 
+//* this package hasn't support typescript
 var slug = require('mongoose-slug-updater');
 
 //* initialize slug
@@ -11,12 +12,13 @@ export interface IProject extends Document {
     _id: string;
     userId: IUser['_id']
     name: string;
+    slug : string,
     description: string;
     date: Date,
     configures : Array<IConfigure>
 }
 
-const projectShema = new Schema({
+const projectSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -55,5 +57,5 @@ const projectShema = new Schema({
 });
 
 
-export const Project = model<IProject>('Project', projectShema);
+export const Project = model<IProject>('Project', projectSchema);
 Object.seal(Project);
