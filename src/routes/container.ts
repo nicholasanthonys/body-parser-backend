@@ -63,7 +63,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     if (user) {
         try {
-            const container = await ContainerModel.findById(id) as IContainer
+            const container = await ContainerModel.findById(id).select('-routers.project_id') as IContainer
             if (container) {
 
                 const projects = await Project.find({
@@ -72,16 +72,17 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 
 
-                let temp = {
+                let temp : any = {
                     id: container.id,
                     containerId: container.containerId,
-
+                    isContainerCreated : container.isContainerCreated,
                     name: container.name,
                     status: container.status,
                     description: container.description,
                     routers: container.routers,
                     projects: projects,
                 }
+
                 return res.status(200).send({
                     container: temp
 
@@ -103,12 +104,12 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.put("/", async (req: Request, res: Response) => {
     try {
         const user = decodeToken(req);
-
+        
         if (user) {
             const { projectIds, name, description, routers, id } = req.body;
+            
 
-
-            const updatedContainer = await ContainerModel.findOneAndUpdate({ userId: user.id, id: id }, {
+            const updatedContainer = await ContainerModel.findOneAndUpdate({ userId: user.id, _id: id }, {
                 projectIds,
                 name, description,
                 routers
@@ -116,15 +117,17 @@ router.put("/", async (req: Request, res: Response) => {
             }, {
                 new: true
             });
+                
 
             const projects = await Project.find({
                 '_id': { $in: updatedContainer.projectIds }
             }).select(['-configures', '-finalResponse'])
 
-            let temp = {
+
+            let temp : any = {
                 id: updatedContainer.id,
                 containerId: updatedContainer.containerId,
-
+                isContainerCreated : updatedContainer.isContainerCreated,
                 name: updatedContainer.name,
                 status: updatedContainer.status,
                 description: updatedContainer.description,
@@ -142,7 +145,7 @@ router.put("/", async (req: Request, res: Response) => {
 
 });
 
-//* Delete a container
+//* Delete a container (config and docker container)
 router.delete("/:id", async (req: Request, res: Response) => {
     const { id } = req.params
 
@@ -294,6 +297,7 @@ router.post('/docker-container', async (req: Request, res: Response) => {
                     await container.start();
                     dbContainer.status = 'running'
                 }
+                dbContainer.isContainerCreated = true;
                 await dbContainer.save()
 
 
