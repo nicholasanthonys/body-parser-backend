@@ -45,7 +45,8 @@ const containerSchema = new Schema({
         required: false
     },
     projectIds : {
-        type : [Schema.Types.ObjectId]
+        type : [Schema.Types.ObjectId],
+        default : [],
     },
     routers : {
         type : [routerSchema],

@@ -64,6 +64,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     const { project } = req.body;
+
     if (user) {
         try {
             const updatedProject = await Project.findOneAndUpdate(

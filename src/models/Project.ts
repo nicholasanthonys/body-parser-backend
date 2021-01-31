@@ -13,6 +13,7 @@ export interface IProject extends Document {
     description: string;
     date: Date,
     configures : Array<IConfigure>
+    finalResponse : IConfigure
 }
 
 const projectSchema = new Schema({
