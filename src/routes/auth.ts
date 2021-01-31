@@ -125,9 +125,9 @@ router.delete("/logout", async (req: Request, res: Response) => {
   try {
     const refreshToken = req.body.refreshToken;
     await RefreshToken.deleteOne({ refreshToken: refreshToken })
-    return res.send(204);
+    return res.sendStatus(204);
   } catch (err) {
-    return res.send(204);
+    return res.status(500).send({message : err});
   }
 })
 
