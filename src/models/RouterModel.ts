@@ -16,7 +16,12 @@ export const routerSchema = new Schema({
         required: true,
 
     },
-    project_directory: {
+    project_id: {
+        type: String,
+        required: true,
+
+    },
+    project_directory :  {
         type: String,
         required: false,
         select: false,
@@ -43,7 +48,8 @@ routerSchema.set('toJSON', {
 });
 
 routerSchema.pre('save', function (this: IRouterModel, next: Function) {
-    this.project_directory = this.get('_id');
+    this.project_directory = this.get('project_id');
+    
     next()
 });
 
