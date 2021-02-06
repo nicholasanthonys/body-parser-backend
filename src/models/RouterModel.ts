@@ -2,7 +2,8 @@ import { Schema, Document, model } from 'mongoose';
 
 export interface IRouterModel extends Document {
     _id: string;
-    path: string
+    path: string,
+    project_id : string,
     project_directory: string,
     type: string;
     method: string;
@@ -23,7 +24,7 @@ export const routerSchema = new Schema({
     },
     project_directory :  {
         type: String,
-        required: false,
+        required: true,
         select: false,
     },
     type: {
@@ -47,9 +48,10 @@ routerSchema.set('toJSON', {
     },
 });
 
-routerSchema.pre('save', function (this: IRouterModel, next: Function) {
+routerSchema.pre('validate', function (this: IRouterModel, next: Function) {
+   
     this.project_directory = this.get('project_id');
-    
+  
     next()
 });
 
