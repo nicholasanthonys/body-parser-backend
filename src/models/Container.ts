@@ -1,23 +1,21 @@
 import { Schema, Document, model } from 'mongoose';
-import {IUser} from './User';
-import {IProject} from './Project';
-import {IRouterModel, routerSchema} from './RouterModel';
+import { IUser } from './User';
+import { IProject } from './Project';
+import { IRouterModel, routerSchema } from './RouterModel';
 import { boolean } from 'joi';
 
 
 
 export interface IContainer extends Document {
     _id: string;
-    userId : IUser['_id']
+    userId: IUser['_id']
     containerId: string,
     name: string;
-    status : string,
     description: string;
-    projectIds :Array<IProject['_id']>
+    projectIds: Array<IProject['_id']>
     routers: [IRouterModel],
-    isContainerCreated : Boolean
     date: Date,
- 
+
 }
 
 
@@ -29,35 +27,27 @@ const containerSchema = new Schema({
     },
     containerId: {
         type: String,
-        required : false,
-        default : null
+        required: false,
+        default: null
     },
-    name: { 
+    name: {
         type: String,
-        required : true, 
-    },
-    status: { 
-        type: String, 
-        default : "stopped",
+        required: true,
     },
     description: {
         type: String,
         required: false
     },
-    projectIds : {
-        type : [Schema.Types.ObjectId],
-        default : [],
-    },
-    routers : {
-        type : [routerSchema],
+    projectIds: {
+        type: [Schema.Types.ObjectId],
         required : false,
+        default: [],
     },
-    isContainerCreated : {
-        type : Boolean,
-        required : false,
-        default: false,  
+    routers: {
+        type: [routerSchema],
+        required: false,
     },
-    date: {
+   date: {
         type: Date,
         default: Date.now,
     },
