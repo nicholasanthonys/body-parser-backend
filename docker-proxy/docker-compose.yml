@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+  proxy:
+    image: dannydirect/tinyproxy:latest
+    container_name: proxy_middleware 
+    restart: unless-stopped
+    ports:
+      - 81:8888
+    networks:
+      proxy_middleware_net:
+    command: ANY
+networks:
+  proxy_middleware_net:
+    external: true
