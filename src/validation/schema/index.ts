@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 export const deletesSchema = Joi.object({
     header: Joi.array().items(Joi.string()),
     body: Joi.array().items(Joi.string()),
@@ -44,4 +45,20 @@ export const configSchema = Joi.object({
         response: baseRequestResponse,
     })
 
+})
+
+
+export const routerSchema = Joi.object({
+    path : Joi.string().required(),
+    type : Joi.string().required(),
+    method : Joi.string().required(),
+    project_id : Joi.string().required()
+})
+
+export const configContainer = Joi.object({
+    id : Joi.string(),
+    name : Joi.string().required(),
+    description : Joi.string().allow(null,''),
+    projectIds : Joi.array().items(Joi.string().required()).required(),
+    routers : Joi.array().items(routerSchema.required()).required()
 })
