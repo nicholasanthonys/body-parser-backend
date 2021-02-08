@@ -2,14 +2,23 @@ import { Request, Response, Router } from "express";
 import { Project } from "src/models/Project";
 import { Configure } from "src/models/Configure";
 import decodeToken from "src/utils/decodeToken";
+import { IConfigure } from '../models/Configure'
+import { IFinalResponse } from "src/models/Response";
+import { storeProjectValidation, updateProjectValidation } from "src/validation/validation";
 const router = Router();
 
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
-    const { name, description, configures, finalResponse } = req.body;
+    const { name, description, configures, finalResponse }: { name: String, description: String, configures: Array<IConfigure>, finalResponse: IFinalResponse } = req.body;
     const user = decodeToken(req);
-
     if (user) {
+        const { error } = storeProjectValidation(req.body);
+        if (error) {
+            return res.status(400).send({
+                message: error.message
+            })
+        }
+
         const newProject = new Project({
             userId: user.id,
             name,
@@ -17,6 +26,7 @@ router.post("/", async (req: Request, res: Response) => {
             configures,
             finalResponse,
         });
+
 
         try {
             await newProject.save({ checkKeys: false }); //* Set check keys = false in order to insert key with ($) or (.)
@@ -66,6 +76,12 @@ router.put("/", async (req: Request, res: Response) => {
     const { project } = req.body;
 
     if (user) {
+        const { error } = updateProjectValidation(req.body);
+        if (error) {
+            return res.status(400).send({
+                message: error.message
+            })
+        }
         try {
             const updatedProject = await Project.findOneAndUpdate(
                 { userId: user.id, _id: project.id },
