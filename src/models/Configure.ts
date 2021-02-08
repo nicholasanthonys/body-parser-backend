@@ -148,7 +148,6 @@ configSchema.set('toJSON', {
 
 export interface IConfigure extends Document {
     _id: string;
-    projectId: IProject['_id']
     config: IConfig
     description: String,
 
@@ -158,7 +157,7 @@ export interface IConfigure extends Document {
 export const configureSchema = new Schema({
     config: {
         type: configSchema,
-        required: true
+        required: true,
     },
     description: {
         type: String,
@@ -174,6 +173,8 @@ configureSchema.set('toJSON', {
     virtuals: true,
     transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
+        delete ret._id;
+        delete ret.date;
     },
 })
 
