@@ -173,6 +173,8 @@ configureSchema.set('toJSON', {
     virtuals: true,
     transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
+        delete ret._id;
+        delete ret.date;
     },
 })
 

@@ -21,10 +21,9 @@ export const loginValidation = (data: Request): ValidationResult => {
 }
 
 export const storeConfigurevalidation = (data: Request): ValidationResult => {
-  const schema = Joi.object({
+  const schema = configSchema.keys({
     projectId: Joi.string().required(),
     description: Joi.string(),
-    config: configSchema
   })
   return schema.validate(data)
 }
@@ -43,6 +42,7 @@ export const updateProjectValidation = (data: Request): ValidationResult => {
   const schema = Joi.object({
     project: Joi.object({
       id : Joi.string().required(),
+      date : Joi.date(),
       name: Joi.string().required(),
       description: Joi.string().allow(null, ''),
       configures: Joi.array().items(configSchema).required(),

@@ -38,27 +38,31 @@ export const finalResponseSchema = Joi.object({
 })
 
 
-export const configSchema = Joi.object({
+export const configSchema = Joi.object().keys({
+    id: Joi.string(),
     description: Joi.string().allow(null, ''),
     config: Joi.object({
         request: requestSchema,
         response: baseRequestResponse,
+
     })
+
 
 })
 
 
 export const routerSchema = Joi.object({
-    path : Joi.string().required(),
-    type : Joi.string().required(),
-    method : Joi.string().required(),
-    project_id : Joi.string().required()
+    path: Joi.string().required(),
+    type: Joi.string().required(),
+    method: Joi.string().required(),
+    project_id: Joi.string().required()
 })
 
 export const configContainer = Joi.object({
-    id : Joi.string(),
-    name : Joi.string().required(),
-    description : Joi.string().allow(null,''),
-    projectIds : Joi.array().items(Joi.string().required()).required(),
-    routers : Joi.array().items(routerSchema.required()).required()
+    id: Joi.string(),
+    name: Joi.string().required(),
+    containerId : Joi.string().allow(null),
+    description: Joi.string().allow(null, ''),
+    projectIds: Joi.array().items(Joi.string().required()).required(),
+    routers: Joi.array().items(routerSchema.required()).required()
 })
