@@ -1,6 +1,24 @@
 import { Request } from 'express';
 import Joi, { ValidationResult } from 'joi';
-import { configSchema, finalResponseSchema } from './schema';
+import { configContainer, configSchema, finalResponseSchema } from './schema';
+
+export const registerValidation = (data: Request): ValidationResult => {
+  const schema = Joi.object({
+    name: Joi.string().min(5).max(255).required(),
+    email: Joi.string().min(6).max(255).required().email(),
+    password: Joi.string().min(6).max(1024).required(),
+  });
+  return schema.validate(data);
+};
+
+
+export const loginValidation = (data: Request): ValidationResult => {
+  const schema = Joi.object({
+    email: Joi.string().min(6).max(255).required().email(),
+    password: Joi.string().min(6).max(1024).required(),
+  });
+  return schema.validate(data);
+}
 
 export const storeConfigurevalidation = (data: Request): ValidationResult => {
   const schema = Joi.object({
@@ -10,7 +28,6 @@ export const storeConfigurevalidation = (data: Request): ValidationResult => {
   })
   return schema.validate(data)
 }
-
 
 export const storeProjectValidation = (data: Request): ValidationResult => {
   const schema = Joi.object({
@@ -36,22 +53,6 @@ export const updateProjectValidation = (data: Request): ValidationResult => {
   return schema.validate(data)
 }
 
-export const registerValidation = (data: Request): ValidationResult => {
-  const schema = Joi.object({
-    name: Joi.string().min(5).max(255).required(),
-    email: Joi.string().min(6).max(255).required().email(),
-    password: Joi.string().min(6).max(1024).required(),
-  });
-  return schema.validate(data);
-};
-
-
-export const loginValidation = (data: Request): ValidationResult => {
-  const schema = Joi.object({
-    email: Joi.string().min(6).max(255).required().email(),
-    password: Joi.string().min(6).max(1024).required(),
-  });
-  return schema.validate(data);
+export const storeOrUpdateConfigContainer = (data:Request) : ValidationResult => {
+ return configContainer.validate(data)
 }
-
-

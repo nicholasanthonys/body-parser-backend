@@ -6,6 +6,7 @@ import { IProject, Project } from 'src/models/Project';
 import jsonfile from 'jsonfile'
 import shell from "shelljs";
 import { IRouterModel } from 'src/models/RouterModel';
+import { storeOrUpdateConfigContainer } from 'src/validation/validation';
 
 const router = Router();
 let docker: Docker = new Docker({ socketPath: "/var/run/docker.sock" });
@@ -18,7 +19,12 @@ router.post("/", async (req: Request, res: Response) => {
 
 
     if (user) {
-
+        const { error } = storeOrUpdateConfigContainer(req.body);
+        if (error) {
+            return res.status(400).send({
+                message: error.message
+            })
+        }
         try {
             // * Inserting to database
             const newDbContainer = new ContainerModel({
@@ -116,20 +122,27 @@ router.put("/", async (req: Request, res: Response) => {
         const user = decodeToken(req);
 
         if (user) {
+            const { error } = storeOrUpdateConfigContainer(req.body);
+            if (error) {
+                return res.status(400).send({
+                    message: error.message
+                })
+            }
+
             const { projectIds, name, description, routers, id } = req.body;
             console.log("projectIds is");
             console.log(projectIds);
 
             let updatedContainer = await ContainerModel.findOne({ userId: user.id, _id: id }) as IContainer;
-            if(!updatedContainer){
-                return res.status(400).send({message : 'No configuration container found'})
+            if (!updatedContainer) {
+                return res.status(400).send({ message: 'No configuration container found' })
             }
             updatedContainer.projectIds = projectIds
             updatedContainer.name = name;
             updatedContainer.description = description;
             updatedContainer.routers = routers;
             await updatedContainer.save()
-       
+
 
 
             const projects = await Project.find({
@@ -389,6 +402,12 @@ router.put('/docker-container', async (req: Request, res: Response) => {
 
         //* Find from database
         let dbContainer = await ContainerModel.findOne({ _id: idString, userId: user.id }) as IContainer
+        if (!dbContainer) {
+            return res.status(400).send({
+                message: 'No Container found'
+
+            })
+        }
         if (dbContainer.containerId) {
             //* get docker letcontainer
             let dockerContainer = docker.getContainer(dbContainer.containerId);
