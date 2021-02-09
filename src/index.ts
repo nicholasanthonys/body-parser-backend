@@ -1,7 +1,6 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose'
 import dotenv from 'dotenv';
-
+import {connectToMongo} from './database/connect';
 //* Cors Middleware
 import cors from 'cors';
 
@@ -23,20 +22,10 @@ dotenv.config();
 const port = process.env.PORT || 5000
 
 //* Read MONGO URI from .env
-const DB_CONNECT = process.env.DB_CONNECT;
+
 
 //* connect to mongodb
-mongoose.connect(
-  `${DB_CONNECT}`, // Use template string otherwise this will be error
-  {
-    useFindAndModify: false,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex : true,
-  },
-  () => console.log("connected to db")
-);
-
+connectToMongo();
 
 const app: Application = express();
 
@@ -62,9 +51,9 @@ app.use(validateToken);
 //* this route is protected with token
 app.use(`${prefixRoute}/dashboard`, dashboardRoutes);
 app.use(`${prefixRoute}/user`, userRoute);
-app.use(`${prefixRoute}/project`,projectRoute);
-app.use(`${prefixRoute}/configure`,configureRoute);
-app.use(`${prefixRoute}/container`,containerRoute);
+app.use(`${prefixRoute}/project`, projectRoute);
+app.use(`${prefixRoute}/configure`, configureRoute);
+app.use(`${prefixRoute}/container`, containerRoute);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
