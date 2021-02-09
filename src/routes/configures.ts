@@ -66,8 +66,9 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectId, configureId } = req.query;
+    const {  configureId } = req.query;
     const configure = req.body
+    const {projectId} = configure
     if (user) {
         const {error} = storeConfigurevalidation(req.body);
         if(error) {
