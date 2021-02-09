@@ -27,7 +27,7 @@ export const baseRequestResponse = base.keys({
 
 export const requestSchema = baseRequestResponse.keys({
     destination_url: Joi.string().required(),
-    destination_path: Joi.string(),
+    destination_path: Joi.string().allow('',null),
     method: Joi.string()
 })
 
@@ -59,7 +59,7 @@ export const routerSchema = Joi.object({
 })
 
 export const configContainer = Joi.object({
-    id: Joi.string(),
+    id: Joi.string().allow(null),
     name: Joi.string().required(),
     containerId : Joi.string().allow(null),
     description: Joi.string().allow(null, ''),
