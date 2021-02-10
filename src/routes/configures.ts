@@ -3,19 +3,19 @@ import { Request, Response, Router } from 'express';
 import { Configure, IConfig, IConfigure } from '../models/Configure';
 import { IProject, Project } from '../models/Project';
 import decodeToken from '../utils/decodeToken';
-import { storeConfigurevalidation} from '../validation/validation'
+import { storeConfigurevalidation } from '../validation/validation'
 const router = Router();
 router.post("/", async (req: Request, res: Response) => {
     const { projectId, config, description } = req.body;
     const user = decodeToken(req);
     if (user) {
-        const {error} = storeConfigurevalidation(req.body);
-        if(error){
+        const { error } = storeConfigurevalidation(req.body);
+        if (error) {
             return res.status(400).json({
-                message : error.details[0].message
+                message: error.details[0].message
             })
         }
-        
+
         //* Find project by id
         try {
             const project = await Project.findById(projectId) as IProject;
@@ -45,7 +45,7 @@ router.get("/", async (req: Request, res: Response) => {
     const { projectId, configureId } = req.query;
     if (user) {
         try {
-            const project = await Project.findById( projectId) as IProject
+            const project = await Project.findById(projectId) as IProject
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
 
@@ -66,14 +66,13 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const {  configureId } = req.query;
-    const configure = req.body
-    const {projectId} = configure
+    const { configureId } = req.query;
+    const { config,description, projectId }: { config: IConfig, description : String, projectId : String } =req.body 
     if (user) {
-        const {error} = storeConfigurevalidation(req.body);
-        if(error) {
+        const { error } = storeConfigurevalidation(req.body);
+        if (error) {
             return res.status(400).send({
-                message : error.details[0].message
+                message: error.details[0].message
             })
         }
 
@@ -82,9 +81,12 @@ router.put("/", async (req: Request, res: Response) => {
             if (project) {
                 let index = project.configures.findIndex((element) => element._id == configureId);
                 if (index >= 0) {
-                    project.configures[index] = configure
+                    project.configures[index].description = description
+                    project.configures[index].config = config
                     await project.save();
-                    return res.status(200).send(project);
+                    return res.status(200).send({
+                        configure: project.configures[index]
+                    });
                 }
                 return res.status(400).send({ "message": "Configure not found" });
             }

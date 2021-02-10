@@ -28,14 +28,12 @@ fieldSchema.set('toJSON', {
 });
 
 export interface IDeleteField  extends Document {
-    param: [String]
     header: [String],
     body: [String],
     query: [String],
 }
 
 const fieldDeleteSchema  = new Schema({
-    param : [String],
     header:[String],
     body: [String],
     query: [String]
@@ -106,7 +104,7 @@ export const commandSchema = new Schema({
     },
     adds : fieldSchema,
     modifies : fieldSchema,
-    delete : fieldDeleteSchema
+    deletes : fieldDeleteSchema
 },{_id : false, id :false});
 
 //* remove _id and _v from commandSchema when returning to JSON
