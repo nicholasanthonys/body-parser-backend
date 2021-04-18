@@ -6,8 +6,8 @@ import { IFinalResponseConfig, finalResponseConfigSchema} from '../Response';
 
 export interface ISerial extends Document {
     configures: Array<IConfigureFile>
-    nextFailure: IFinalResponseConfig
-    cLogics: Array<ICLogic>
+    next_failure: IFinalResponseConfig
+    c_logics: Array<ICLogic>
 }
 
 export const serialSchema = new Schema({

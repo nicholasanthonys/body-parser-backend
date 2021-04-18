@@ -1,8 +1,8 @@
-import { Schema, Document, model} from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 
 
 export interface IConfigureFile extends Document {
-    fileName: String
+    file_name: String
     alias: String
 }
 
@@ -28,4 +28,4 @@ configureFileSchema.set('toJSON', {
         delete ret.__v;
     },
 });
- model<IConfigureFile>('configureFile', configureFileSchema);
+export const ConfigureFile = model<IConfigureFile>('configureFile', configureFileSchema);

@@ -7,7 +7,7 @@ import { finalResponseSchema } from '../Response'
 export interface ICLogic extends Document {
     rule: Object
     data: Object | null;
-    nextSuccess: string | null;
+    next_success: string | null;
     response: IFinalResponseConfig
 }
 
@@ -45,4 +45,4 @@ cLogicSchema.set('toJSON', {
         delete ret.__v;
     },
 });
-model<ICLogic>('cLogic', cLogicSchema);
+export const CLogic = model<ICLogic>('cLogic', cLogicSchema);
