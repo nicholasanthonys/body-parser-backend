@@ -69,8 +69,7 @@ router.get("/:id", async (req: Request, res: Response) => {
             return res.status(400).send({ message: "No container found" });
         }
         return res.status(200).send({
-            container: containerWithStatus
-
+            ...containerWithStatus
         })
 
     } catch (error) {
@@ -119,20 +118,20 @@ router.delete("/:id", async (req: Request, res: Response) => {
     const { id } = req.params
 
     const user = decodeToken(req);
-    if(!user){
+    if (!user) {
         return res.sendStatus(403);
     }
-        try {
-            let isDeleted = await containerController.delete(id, user.id);
-            if(!isDeleted){
-                return res.status(400).send({ message: "Container not found"})
+    try {
+        let isDeleted = await containerController.delete(id, user.id);
+        if (!isDeleted) {
+            return res.status(400).send({ message: "Container not found" })
 
-            }
-            return res.status(200).send({ message: "Delete Success"})
-
-        } catch (error) {
-            return res.status(400).send({ message: error })
         }
+        return res.status(200).send({ message: "Delete Success" })
+
+    } catch (error) {
+        return res.status(400).send({ message: error })
+    }
 
 });
 

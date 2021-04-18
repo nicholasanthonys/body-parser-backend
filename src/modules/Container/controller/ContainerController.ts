@@ -1,5 +1,6 @@
-import { IStoreContainerDTO, IUpdateContainerDTO, } from "../DTO/StoreContainerDTO";
-import { Container as ContainerModel, IContainer, IContainerWithStatus } from 'src/modules/Container/Container';
+import { IStoreContainerDTO } from "../DTO/StoreContainerDTO";
+import { IUpdateContainerDTO } from "../DTO/UpdateContainerDTO";
+import { Container as ContainerModel, IContainer, IContainerCustom } from 'src/modules/Container/Container';
 import { IProject, Project } from "src/modules/Project/Project";
 
 import Docker, { Container } from 'dockerode';
@@ -11,10 +12,10 @@ export default class ContainerController {
 
     async store(storeContainerDTO: IStoreContainerDTO, userId: string): Promise<IContainer> {
         return await new ContainerModel({
-            userId: userId,
+            user_id: userId,
             name: storeContainerDTO.name,
             description: storeContainerDTO.description,
-            projectIds: storeContainerDTO.project_ids,
+            project_ids: storeContainerDTO.project_ids,
             routers: storeContainerDTO.routers
         }).save();
 
@@ -28,7 +29,8 @@ export default class ContainerController {
 
     }
 
-    async show(dbContainerId: string, userId: string): Promise<IContainerWithStatus | null> {
+    async show(dbContainerId: string, userId: string): Promise<IContainerCustom | null> {
+
         const container = await ContainerModel.findOne({
             _id: dbContainerId,
             user_id: userId
@@ -38,15 +40,19 @@ export default class ContainerController {
             return null;
         }
 
+
         let running = false;
-        const dockerContainer = this.docker.getContainer(container.container_id)
-        if (dockerContainer) {
-            let state = (await dockerContainer.inspect()).State;
-            running = state.Running
+
+        const dockerContainerInspect = await this.getDockerContainerInspectInfo(container.id)
+        console.log("dockercontainer inspect is")
+        console.log(dockerContainerInspect)
+
+        if (dockerContainerInspect) {
+            running = dockerContainerInspect.State.Running
         }
 
 
-        let containerWithStatus: IContainerWithStatus = {
+        let containerWithStatus: IContainerCustom = {
             _id: container._id,
             user_id: container.user_id,
             container_id: container.container_id,
@@ -80,7 +86,7 @@ export default class ContainerController {
 
     }
 
-    async update(updateContainerDTO: IUpdateContainerDTO, userId: string): Promise<IContainerWithStatus | null> {
+    async update(updateContainerDTO: IUpdateContainerDTO, userId: string): Promise<IContainerCustom | null> {
         let container = await ContainerModel.findOne({ user_id: userId, _id: updateContainerDTO.id }) as IContainer;
         if (!container) {
             return null;
@@ -101,17 +107,16 @@ export default class ContainerController {
         });
         let updatedContainer = await container.save()
 
+        let dockerContainerInspect = null;
+
+        //get Status container'
         let running = false;
-        if (updatedContainer.container_id) {
-            //get Status container
-            const dockerContainer = this.docker.getContainer(updatedContainer.container_id)
-            if (dockerContainer) {
-                let state = (await dockerContainer.inspect()).State;
-                running = state.Running
-            }
+        dockerContainerInspect = await this.getDockerContainerInspectInfo(updatedContainer.container_id);
+        if (dockerContainerInspect) {
+            running = dockerContainerInspect.State.Running
         }
 
-        let updatedContainerWithStatus: IContainerWithStatus = {
+        let updatedContainerWithStatus: IContainerCustom = {
             _id: updatedContainer._id,
             user_id: updatedContainer.user_id,
             container_id: updatedContainer.container_id,
@@ -135,15 +140,36 @@ export default class ContainerController {
         //* remove from database
         await ContainerModel.deleteOne({ _id: containerId });
 
-        //* remove from docker
-        let dockerContainer = await this.docker.getContainer(containerId)
+        try {
+            //* remove from docker
+            let dockerContainer = await this.docker.getContainer(containerId)
 
-        if (dockerContainer) {
-            await dockerContainer.remove();
+            if (dockerContainer) {
+                await dockerContainer.remove();
+            }
+        } catch (error) {
+            console.log(error);
         }
 
         return true;
 
+    }
+
+    async getDockerContainerInspectInfo(containerId: string): Promise<Docker.ContainerInspectInfo | null> {
+        try {
+
+            const dockerContainer = this.docker.getContainer(containerId)
+            if (!dockerContainer) {
+                return null
+            }
+
+            let state = (await dockerContainer.inspect());
+            return state;
+
+        } catch (error) {
+            console.log(error)
+            return null
+        }
     }
 
 }

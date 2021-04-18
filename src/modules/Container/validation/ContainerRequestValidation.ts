@@ -3,9 +3,9 @@ export const storeContainerValidation = (data: Request): ValidationResult => {
     const schema =Joi.object({
         id: Joi.string().allow(null),
         name: Joi.string().required(),
-        containerId: Joi.string().allow(null),
+        container_id: Joi.string().allow(null),
         description: Joi.string().allow(null, ''),
-        projectIds: Joi.array().items(Joi.string().required()).required(),
+        project_ids: Joi.array().items(Joi.string().required()).required(),
         routers: Joi.array().items(routerSchema.required()).required()
     })
     return schema.validate(data)
@@ -22,9 +22,9 @@ export const updateContainerValidation = (data: Request): ValidationResult => {
     const schema =Joi.object({
         id: Joi.string().allow(null),
         name: Joi.string().required(),
-        containerId: Joi.string().allow(null),
+        container_id: Joi.string().allow(null),
         description: Joi.string().allow(null, ''),
-        projectIds: Joi.array().items(Joi.string().required()).required(),
+        project_ids: Joi.array().items(Joi.string().required()).required(),
         routers: Joi.array().items(routerSchema.required()).required()
     })
     return schema.validate(data)
