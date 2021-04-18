@@ -1,6 +1,5 @@
 import { Request } from 'express';
 import Joi, { ValidationResult } from 'joi';
-import { baseOption, configContainer } from './schema';
 
 export const registerValidation = (data: Request): ValidationResult => {
   const schema = Joi.object({
@@ -20,6 +19,6 @@ export const loginValidation = (data: Request): ValidationResult => {
   return schema.validate(data);
 }
 
-export const storeOrUpdateConfigContainer = (data: Request): ValidationResult => {
-  return configContainer.validate(data)
-}
+// export const storeOrUpdateConfigContainer = (data: Request): ValidationResult => {
+//   return configContainer.validate(data)
+// }
