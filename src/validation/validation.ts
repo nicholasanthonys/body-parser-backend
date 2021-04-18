@@ -19,15 +19,6 @@ export const loginValidation = (data: Request): ValidationResult => {
   });
   return schema.validate(data);
 }
-
-export const storeConfigurevalidation = (data: Request): ValidationResult => {
-  const schema = configSchema.keys({
-    project_id: Joi.string().required(),
-    description: Joi.string(),
-  })
-  return schema.validate(data)
-}
-
 export const storeProjectValidation = (data: Request): ValidationResult => {
   const schema = Joi.object({
     name: Joi.string().required(),
