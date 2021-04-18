@@ -3,6 +3,7 @@ export default interface IUpdateConfigureDTO {
     project_id : string,
     description : string,
     config : {
+        id : string,
         request : IConfigureRequest,
         response : IConfigureResponse
     }
