@@ -16,7 +16,7 @@ export interface IContainer extends Document {
     date: Date,
 }
 
-export interface IContainerWithStatus{
+export interface IContainerCustom {
     _id: string;
     user_id: IUser['_id']
     container_id: string,
@@ -25,7 +25,9 @@ export interface IContainerWithStatus{
     project_ids: Array<IProject['_id']>
     routers: Array<IRouterModel>,
     date: Date,
-    running : boolean // will be fetched from docker daemon
+
+    //* will be fetched from docker daemon
+    running: boolean
 }
 
 
@@ -49,14 +51,14 @@ const containerSchema = new Schema({
     },
     project_ids: {
         type: [Schema.Types.ObjectId],
-        required : false,
+        required: false,
         default: [],
     },
     routers: {
         type: [routerSchema],
         required: false,
     },
-   date: {
+    date: {
         type: Date,
         default: Date.now,
     },
