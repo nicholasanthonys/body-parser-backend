@@ -1,22 +1,33 @@
 import Joi from 'joi';
 import { join } from 'path';
 
-export const deletesSchema = Joi.object({
+export const deletesRequestSchema = Joi.object({
     header: Joi.array().items(Joi.string()),
     body: Joi.array().items(Joi.string()),
     query: Joi.array().items(Joi.string()),
 })
 
-export const addOrModifySchema = Joi.object({
-    header: Joi.object(),
-    body: Joi.object(),
-    query: Joi.object()
+export const deletesResponseSchema = Joi.object({
+    header: Joi.array().items(Joi.string()),
+    body: Joi.array().items(Joi.string()),
+})
+
+
+export const addOrModifySchemaRequest = Joi.object({
+    header: Joi.object().required(),
+    body: Joi.object().required(),
+    query: Joi.object().required()
+})
+
+export const addOrModifySchemaResponse = Joi.object({
+    header: Joi.object().required(),
+    body: Joi.object().required(),
 })
 
 export const base = Joi.object().keys({
-    adds: addOrModifySchema,
-    modifies: addOrModifySchema,
-    deletes: deletesSchema
+    adds: addOrModifySchemaRequest,
+    modifies: addOrModifySchemaRequest,
+    deletes: deletesRequestSchema
 
 })
 
@@ -42,9 +53,9 @@ export const finalResponseSchema = Joi.object({
     transform: Joi.string().required(),
     log_before_modify: Joi.string().allow(null, ''),
     log_after_modify: Joi.string().allow(null, ''),
-    adds: addOrModifySchema,
-    modifies: addOrModifySchema,
-    deletes: deletesSchema
+    adds: addOrModifySchemaResponse,
+    modifies: addOrModifySchemaResponse,
+    deletes: deletesResponseSchema
 })
 
 
