@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import decodeToken from "src/utils/decodeToken";
-import { storeProjectValidation, updateProjectValidation } from "src/validation/validation";
+import { storeProjectValidation, updateProjectValidation } from "src/modules/Project/validation/ProjectRequestValidation";
 import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
