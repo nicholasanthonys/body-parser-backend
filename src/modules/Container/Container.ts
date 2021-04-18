@@ -2,30 +2,39 @@ import { Schema, Document, model } from 'mongoose';
 import { IUser } from '../User';
 import { IProject } from '../Project/Project';
 import { IRouterModel, routerSchema } from '../RouterModel';
-import { boolean } from 'joi';
 
 
 
 export interface IContainer extends Document {
     _id: string;
-    userId: IUser['_id']
-    containerId: string,
+    user_id: IUser['_id']
+    container_id: string,
     name: string;
     description: string;
-    projectIds: Array<IProject['_id']>
-    routers: [IRouterModel],
+    project_ids: Array<IProject['_id']>
+    routers: Array<IRouterModel>,
     date: Date,
+}
 
+export interface IContainerWithStatus{
+    _id: string;
+    user_id: IUser['_id']
+    container_id: string,
+    name: string;
+    description: string;
+    project_ids: Array<IProject['_id']>
+    routers: Array<IRouterModel>,
+    date: Date,
+    running : boolean // will be fetched from docker daemon
 }
 
 
-
 const containerSchema = new Schema({
-    userId: {
+    user_id: {
         type: Schema.Types.ObjectId,
         required: true,
     },
-    containerId: {
+    container_id: {
         type: String,
         required: false,
         default: null
@@ -38,7 +47,7 @@ const containerSchema = new Schema({
         type: String,
         required: false
     },
-    projectIds: {
+    project_ids: {
         type: [Schema.Types.ObjectId],
         required : false,
         default: [],
