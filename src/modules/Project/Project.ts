@@ -38,7 +38,9 @@ const projectSchema = new Schema({
     },
     configures :{
         type : configureSchema,
-        default : null,
+        default : {
+            description : ''
+        },
         required : false,
     },
     serial : {
