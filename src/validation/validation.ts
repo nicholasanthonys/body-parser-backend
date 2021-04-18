@@ -19,6 +19,3 @@ export const loginValidation = (data: Request): ValidationResult => {
   return schema.validate(data);
 }
 
-// export const storeOrUpdateConfigContainer = (data: Request): ValidationResult => {
-//   return configContainer.validate(data)
-// }
