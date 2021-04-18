@@ -78,7 +78,7 @@ router.put("/", async (req: Request, res: Response) => {
             return res.status(400).send({ message: err.message });
         }
     }
-    return res.status(403).send({ message: "Not authenticated" });
+    return res.sendStatus(403).send({ message: "Not authenticated" });
 });
 
 //* Delete a project
@@ -100,7 +100,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
             return res.status(400).send({ message: err.message() });
         }
     }
-    return res.status(403);
+    return res.sendStatus(403);
 });
 
 export default router;

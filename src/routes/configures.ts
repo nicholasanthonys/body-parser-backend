@@ -12,7 +12,7 @@ router.post("/", async (req: Request, res: Response) => {
     const storeConfigureDTo = req.body as IStoreConfigureDTO;
     const user = decodeToken(req);
     if (!user) {
-        return res.status(403)
+        return res.sendStatus(403)
     }
     const { error } = storeConfigurevalidation(req.body);
     if (error) {
@@ -39,7 +39,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.get('/project/:project_id', async (req: Request,  res: Response) => {
     const user = decodeToken(req);
     if (user == null) {
-        return res.status(403);
+        return res.sendStatus(403);
     }
     const { project_id } =  req.params
     const configure = await configureController.getAll(project_id, user.id)
@@ -57,7 +57,7 @@ router.get("/:configure_id/project/:project_id", async (req: Request, res: Respo
     const user = decodeToken(req);
     const { configure_id, project_id } =  req.params
     if (user == null) {
-        return res.status(403);
+        return res.sendStatus(403);
     }
     try {
         const configure = await configureController.show(project_id as string, configure_id as string, user.id)
@@ -77,7 +77,7 @@ router.put("/", async (req: Request, res: Response) => {
     const updateConfigureDTO = req.body as IUpdateConfigureDTO
 
     if (!user) {
-        return res.status(403)
+        return res.sendStatus(403)
     }
 
     const { error } = updateConfigurevalidation(req.body);
@@ -108,7 +108,7 @@ router.delete("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     const { projectId, configureId } = req.query;
     if (!user) {
-        return res.status(403)
+        return res.sendStatus(403)
     }
     try {
         const isSuccess = await configureController.delete(projectId as string, configureId as string, user.id)

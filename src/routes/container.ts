@@ -6,109 +6,75 @@ import { IProject, Project } from 'src/modules/Project/Project';
 import jsonfile from 'jsonfile'
 import shell from "shelljs";
 import { IRouterModel } from 'src/modules/RouterModel';
-import { storeOrUpdateConfigContainer } from 'src/validation/validation';
-
+import { storeContainerValidation, updateContainerValidation } from 'src/modules/Container/validation/ContainerRequestValidation';
+import ContainerController from 'src/modules/Container/controller/ContainerController';
+import { IStoreContainerDTO } from 'src/modules/Container/DTO/StoreContainerDTO';
+import { IUpdateContainerDTO } from 'src/modules/Container/DTO/UpdateContainerDTO';
 const router = Router();
 let docker: Docker = new Docker({ socketPath: "/var/run/docker.sock" });
 
+const containerController = new ContainerController();
 //* Store a container
 router.post("/", async (req: Request, res: Response) => {
 
-    const { name, description, projectIds, routers, } = req.body;
+    const storeContainerDTO = req.body as IStoreContainerDTO;
     const user = decodeToken(req);
 
-
-    if (user) {
-        const { error } = storeOrUpdateConfigContainer(req.body);
-        if (error) {
-            return res.status(400).send({
-                message: error.message
-            })
-        }
-        try {
-            // * Inserting to database
-            const newDbContainer = new ContainerModel({
-                userId: user.id,
-                name,
-                description,
-                projectIds,
-                routers,
-
-            })
-
-            let newDBContainer = await newDbContainer.save();
-
-            return res.status(200).send(newDBContainer);
-        } catch (err) {
-
-            return res.status(400).send(err);
-        }
-
+    if (!user) {
+        return res.sendStatus(403);
     }
+
+    const { error } = storeContainerValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        let newDBContainer = await containerController.store(storeContainerDTO, user.id)
+        return res.status(200).send(newDBContainer);
+    } catch (err) {
+        return res.status(400).send(err);
+    }
+
 });
 
 //* Get all container
 router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    if (user) {
-        try {
-            let containers = await ContainerModel.find({
-                userId: user.id,
-            }).sort({ date: "desc" });
-
-            return res.status(200).send(containers);
-        } catch (error) {
-            return res.status(400).send(error);
-        }
-
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    try {
+        let containers = await containerController.getAll(user.id);
+        return res.status(200).send(containers);
+    } catch (error) {
+        return res.status(400).send(error);
     }
 });
 
 //* Get a container by id
 router.get("/:id", async (req: Request, res: Response) => {
     const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+
     const { id } = req.params;
-    if (user) {
-        try {
-            const container = await ContainerModel.findById(id) as IContainer
-            if (container) {
+    try {
 
-                const projects = await Project.find({
-                    '_id': { $in: container.projectIds }
-                }).select(['-configures', '-finalResponse'])
-
-
-                let running = false
-
-                if (container.containerId) {
-                    //get Status container
-                    const dockerContainer = docker.getContainer(container.containerId)
-                    if (dockerContainer) {
-                        let state = (await dockerContainer.inspect()).State;
-                        running = state.Running
-                    }
-                }
-
-                let temp: any = {
-                    id: container.id,
-                    containerId: container.containerId,
-                    name: container.name,
-                    running,
-                    description: container.description,
-                    routers: container.routers,
-                    projects: projects,
-                }
-
-                return res.status(200).send({
-                    container: temp
-
-                })
-            }
+        const containerWithStatus = await containerController.show(id, user.id)
+        if (!containerWithStatus) {
             return res.status(400).send({ message: "No container found" });
-        } catch (error) {
-            return res.status(400).send({ message: error.message });
         }
+        return res.status(200).send({
+            container: containerWithStatus
 
+        })
+
+    } catch (error) {
+        return res.status(400).send({ message: error.message });
     }
 
 })
@@ -120,59 +86,24 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.put("/", async (req: Request, res: Response) => {
     try {
         const user = decodeToken(req);
-
-        if (user) {
-            const { error } = storeOrUpdateConfigContainer(req.body);
-            if (error) {
-                return res.status(400).send({
-                    message: error.message
-                })
-            }
-
-            const { projectIds, name, description, routers, id } = req.body;
-            console.log("projectIds is");
-            console.log(projectIds);
-
-            let updatedContainer = await ContainerModel.findOne({ userId: user.id, _id: id }) as IContainer;
-            if (!updatedContainer) {
-                return res.status(400).send({ message: 'No configuration container found' })
-            }
-            updatedContainer.projectIds = projectIds
-            updatedContainer.name = name;
-            updatedContainer.description = description;
-            updatedContainer.routers = routers;
-            await updatedContainer.save()
-
-
-
-            const projects = await Project.find({
-                '_id': { $in: updatedContainer.projectIds }
-            }).select(['-configures', '-finalResponse'])
-
-
-            let running = false
-
-            if (updatedContainer.containerId) {
-                //get Status container
-                const dockerContainer = docker.getContainer(updatedContainer.containerId)
-                if (dockerContainer) {
-                    let state = (await dockerContainer.inspect()).State;
-                    running = state.Running
-                }
-            }
-
-            let temp: any = {
-                id: updatedContainer.id,
-                containerId: updatedContainer.containerId,
-                name: updatedContainer.name,
-                running,
-                description: updatedContainer.description,
-                routers: updatedContainer.routers,
-                projects: projects,
-            }
-
-            return res.status(200).send({ container: temp });
+        if (!user) {
+            return res.sendStatus(403);
         }
+        const { error } = updateContainerValidation(req.body);
+        if (error) {
+            return res.status(400).send({
+                message: error.message
+            })
+        }
+
+        let updateContainerDTO = req.body as IUpdateContainerDTO
+        let updatedContainer = await containerController.update(updateContainerDTO, user.id)
+
+        if (!updateContainerDTO) {
+            return res.status(400).send({ message: "Container not found" });
+        }
+
+        return res.status(200).send(updatedContainer);
 
 
     } catch (error) {
@@ -188,38 +119,21 @@ router.delete("/:id", async (req: Request, res: Response) => {
     const { id } = req.params
 
     const user = decodeToken(req);
-    if (user) {
+    if(!user){
+        return res.sendStatus(403);
+    }
         try {
-            //* Find user related container 
-            const containerModel = await ContainerModel.findOne({ _id: id, userId: user.id }) as IContainer;
-            if (containerModel) {
-                //* remove from database
-                await ContainerModel.deleteOne({ _id: id });
-                if (containerModel.containerId) {
-                    let container = await docker.getContainer(containerModel.containerId)
-                    //* Remove from docker
-                    let error = null
-                    try {
-                        await container.remove();
-                    } catch (err) {
-                        return res.status(400).send({ message: error });
-                    }
-                }
-                return res.status(200).send({
-                    message: "Container Deleted"
-                });
+            let isDeleted = await containerController.delete(id, user.id);
+            if(!isDeleted){
+                return res.status(400).send({ message: "Container not found"})
 
-            } else {
-                return res.status(400).send({
-                    message: "Container not found"
-                })
             }
+            return res.status(200).send({ message: "Delete Success"})
+
         } catch (error) {
             return res.status(400).send({ message: error })
         }
-    }
 
-    return res.sendStatus(403)
 });
 
 
@@ -237,7 +151,7 @@ router.post('/docker-container', async (req: Request, res: Response) => {
 
             //* write projects and configures
             const projects = await Project.find({
-                '_id': { $in: dbContainer.projectIds }
+                '_id': { $in: dbContainer.project_ids }
             }) as Array<IProject>
 
             let dir = `tmp/containers/${dbContainer._id}/configures`
@@ -284,7 +198,7 @@ router.post('/docker-container', async (req: Request, res: Response) => {
             let file = `${dir}/router.json`
 
             //* write router.json for container
-            let routers: [IRouterModel] = [...dbContainer.routers]
+            let routers: Array<IRouterModel> = [...dbContainer.routers]
             routers.forEach((element) => {
                 element['project_directory'] = element.project_id
             });
@@ -322,10 +236,10 @@ router.post('/docker-container', async (req: Request, res: Response) => {
             ]
 
             //* Delete container if already created
-            if (dbContainer.containerId) {
+            if (dbContainer.container_id) {
                 // * Delete Container
                 try {
-                    const container = docker.getContainer(dbContainer.containerId);
+                    const container = docker.getContainer(dbContainer.container_id);
                     if (container) {
                         let inspect = await container.inspect();
                         if (inspect.State.Running) {
@@ -364,7 +278,7 @@ router.post('/docker-container', async (req: Request, res: Response) => {
                 },
             ).then(async (container) => {
                 // * Update containerId
-                dbContainer.containerId = container.id;
+                dbContainer.container_id = container.id;
 
                 if (autoStart == "true") {
                     //*  auto start
@@ -401,16 +315,16 @@ router.put('/docker-container', async (req: Request, res: Response) => {
     if (user) {
 
         //* Find from database
-        let dbContainer = await ContainerModel.findOne({ _id: idString, userId: user.id }) as IContainer
+        let dbContainer = await ContainerModel.findOne({ _id: idString, user_id: user.id }) as IContainer
         if (!dbContainer) {
             return res.status(400).send({
                 message: 'No Container found'
 
             })
         }
-        if (dbContainer.containerId) {
+        if (dbContainer.container_id) {
             //* get docker letcontainer
-            let dockerContainer = docker.getContainer(dbContainer.containerId);
+            let dockerContainer = docker.getContainer(dbContainer.container_id);
             let inspect = await dockerContainer.inspect()
 
             try {
