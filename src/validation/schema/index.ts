@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { join } from 'path';
 
 export const deletesSchema = Joi.object({
     header: Joi.array().items(Joi.string()),
@@ -31,10 +32,19 @@ export const requestSchema = baseRequestResponse.keys({
     method: Joi.string()
 })
 
+export const responseSchema = baseRequestResponse.keys({
+    status_code : Joi.number().required()
+})
+
 
 export const finalResponseSchema = Joi.object({
-    configure_based: Joi.string().allow(null, ''),
-    response: baseRequestResponse
+    status_code : Joi.number().required(),
+    transform: Joi.string().required(),
+    log_before_modify: Joi.string().allow(null, ''),
+    log_after_modify: Joi.string().allow(null, ''),
+    adds: addOrModifySchema,
+    modifies: addOrModifySchema,
+    deletes: deletesSchema
 })
 
 
@@ -43,10 +53,9 @@ export const configSchema = Joi.object().keys({
     description: Joi.string().allow(null, ''),
     config: Joi.object({
         request: requestSchema,
-        response: baseRequestResponse,
+        response: responseSchema,
 
     })
-
 
 })
 
@@ -65,4 +74,28 @@ export const configContainer = Joi.object({
     description: Joi.string().allow(null, ''),
     projectIds: Joi.array().items(Joi.string().required()).required(),
     routers: Joi.array().items(routerSchema.required()).required()
+})
+
+export const configureFileSchema = Joi.object({
+    fileName:Joi.string().required() ,
+    alias: Joi.string().required()
+})
+
+
+export const cLogicSchema = Joi.object({
+    rule : Joi.object(),
+    data : Joi.object(),
+    next_success : Joi.string(),
+    response : finalResponseSchema
+})
+
+export const parallelSchema = Joi.object({
+    configures : Joi.array().items(configureFileSchema),
+    next_failure : finalResponseSchema,
+    c_logics : Joi.array().items(cLogicSchema)
+})
+
+export const baseOption = Joi.object({
+    project_max_circular : Joi.number().required(),
+    circular_response : finalResponseSchema 
 })

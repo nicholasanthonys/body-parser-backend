@@ -1,11 +1,11 @@
 import { Request, Response, Router } from 'express';
-import { Container as ContainerModel, IContainer } from 'src/models/Container';
+import { Container as ContainerModel, IContainer } from 'src/modules/Container/Container';
 import decodeToken from 'src/utils/decodeToken';
 import Docker, { Container } from 'dockerode';
-import { IProject, Project } from 'src/models/Project';
+import { IProject, Project } from 'src/modules/Project/Project';
 import jsonfile from 'jsonfile'
 import shell from "shelljs";
-import { IRouterModel } from 'src/models/RouterModel';
+import { IRouterModel } from 'src/modules/RouterModel';
 import { storeOrUpdateConfigContainer } from 'src/validation/validation';
 
 const router = Router();
@@ -247,10 +247,10 @@ router.post('/docker-container', async (req: Request, res: Response) => {
                 shell.mkdir('-p', dir + `/${project.id}`)
                 let projectDir = `${dir}/${project.id}`
                 // * Write configure-n.json for each configures
-                project.configures.forEach((configure, index) => {
+                project.configures.configs.forEach((config, index) => {
                     let fileName = 'configure-' + index.toString();
                     let file = `${projectDir}/${fileName}.json`
-                    jsonfile.writeFile(file, configure.config, { spaces: 2, replacer: undefined }, function (err) {
+                    jsonfile.writeFile(file, config, { spaces: 2, replacer: undefined }, function (err) {
                         if (err) {
                             console.log("error is");
                             console.log(err);
@@ -267,13 +267,13 @@ router.post('/docker-container', async (req: Request, res: Response) => {
                 //* Write response for each project
                 let file = `${projectDir}/response.json`
 
-                jsonfile.writeFile(file, project.finalResponse, { spaces: 2 }, function (err) {
-                    if (err) {
+                // jsonfile.writeFile(file, project.finalResponse, { spaces: 2 }, function (err) {
+                //     if (err) {
 
-                        isErr = err;
-                    }
+                //         isErr = err;
+                //     }
 
-                })
+                // })
 
                 if (isErr) {
                     return res.status(500).send({ message: isErr })

@@ -1,7 +1,7 @@
 import { Schema, Document, model } from 'mongoose';
-import { IUser } from './User';
-import { IProject } from './Project';
-import { IRouterModel, routerSchema } from './RouterModel';
+import { IUser } from '../User';
+import { IProject } from '../Project/Project';
+import { IRouterModel, routerSchema } from '../RouterModel';
 import { boolean } from 'joi';
 
 

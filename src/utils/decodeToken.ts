@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jsonwebtoken from 'jsonwebtoken';
-import { IUser,User } from '../models/User';
+import { IUser,User } from '../modules/User';
 
 //* middleware to validate token
-const decodeToken = (req: Request):  IUser | null => {
+const decodeToken = (req: Request):  IUser |null => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
         // Example : Bearer kdjdkaidkwkk(this is the token). Split by space

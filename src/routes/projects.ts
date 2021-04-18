@@ -1,15 +1,15 @@
 import { Request, Response, Router } from "express";
-import { Project } from "src/models/Project";
-import { Configure } from "src/models/Configure";
 import decodeToken from "src/utils/decodeToken";
-import { IConfigure } from '../models/Configure'
-import { IFinalResponse } from "src/models/Response";
 import { storeProjectValidation, updateProjectValidation } from "src/validation/validation";
+import ProjectController from '../modules/Project/Controller/ProjectController'
+import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
+import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
 const router = Router();
 
+const projectControler = new ProjectController();
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
-    const { name, description, configures, finalResponse }: { name: String, description: String, configures: Array<IConfigure>, finalResponse: IFinalResponse } = req.body;
+    const storeProjectDTO = req.body as IStoreProjectDTO;
     const user = decodeToken(req);
     if (user) {
         const { error } = storeProjectValidation(req.body);
@@ -19,18 +19,9 @@ router.post("/", async (req: Request, res: Response) => {
             })
         }
 
-        const newProject = new Project({
-            userId: user.id,
-            name,
-            description,
-            configures,
-            finalResponse,
-        });
-
-
         try {
-            await newProject.save({ checkKeys: false }); //* Set check keys = false in order to insert key with ($) or (.)
-            return res.status(200).send(newProject);
+            const project = await projectControler.store(storeProjectDTO, user.id)
+            return res.status(200).send(project);
         } catch (err) {
             return res.status(400).send(err.message);
         }
@@ -42,10 +33,7 @@ router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
     if (user) {
         //* Get project without its configures, and sort by date (newest or descending)
-        const projects = await Project.find({ userId: user.id })
-            .sort({ date: "desc" })
-            .select("-configures");
-
+        const projects = await projectControler.getAll(user.id)
         return res.status(200).send(projects);
     }
 });
@@ -57,7 +45,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
     if (user) {
         try {
-            const project = await Project.findById(id);
+            const project = await projectControler.show(id, user.id);
             if (project) {
                 return res.status(200).send({
                     project,
@@ -73,7 +61,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 // * Update a project
 router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { project } = req.body;
+    const updateProjectDTO = req.body as IUpdateProjectDTO;
 
     if (user) {
         const { error } = updateProjectValidation(req.body);
@@ -83,15 +71,9 @@ router.put("/", async (req: Request, res: Response) => {
             })
         }
         try {
-            const updatedProject = await Project.findOneAndUpdate(
-                { userId: user.id, _id: project.id },
-                project,
-                {
-                    new: true,
-                }
-            );
+            const updatedProject = await projectControler.update(updateProjectDTO)
 
-            return res.status(200).send({ project: updatedProject });
+            return res.status(200).send(updatedProject);
         } catch (err) {
             return res.status(400).send({ message: err.message });
         }
@@ -107,15 +89,11 @@ router.delete("/:id", async (req: Request, res: Response) => {
     if (user) {
         try {
             //* retrieve project by id
-            const project = Project.findById(id);
-            const projectId = project._id;
-            if (project) {
-                await project.deleteOne({ userId: user.id, id });
-                //* Delete related configures
-                await Configure.deleteMany({ projectId });
-
+            let isSuccess: boolean = await projectControler.delete(id, user.id)
+            if (isSuccess) {
                 return res.status(200).send({ message: "Project has been deleted" });
             }
+
             return res.status(400).send({ message: "Project not found" });
 
         } catch (err) {

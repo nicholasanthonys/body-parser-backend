@@ -21,8 +21,8 @@ fieldFinalResponseSchema.set('toJSON', {
 });
 
 export interface IFinalResponseDeleteField extends Document {
-    header: [String],
-    body: [String],
+    header: Array<string>
+    body: Array<string>,
 }
 
 const fieldFinalResponseDeleteSchema = new Schema({
@@ -43,16 +43,21 @@ fieldFinalResponseDeleteSchema.set('toJSON', {
 
 
 export interface IFinalResponseConfig extends Document {
-    transform: String,
-    log_before_modify: String,
-    log_after_modify: String,
+    status_code : number,
+    transform: string,
+    log_before_modify: string | null,
+    log_after_modify: string | null,
     adds: IFieldFinalResponse,
     modifies: IFieldFinalResponse,
     deletes: IFinalResponseDeleteField
 }
 
 
- const finalResponseConfigSchema = new Schema({
+ export const finalResponseConfigSchema = new Schema({
+    status_code  : {
+        type : String,
+        required  :true,
+    },
     transform: {
         type: String,
         required: false
@@ -83,12 +88,10 @@ finalResponseConfigSchema.set('toJSON', {
 });
 
 export interface IFinalResponse extends Document {
-    configureBased : String,
     response : IFinalResponseConfig
 }
 
 export const finalResponseSchema = new Schema({
-    configure_based : String,
     response : finalResponseConfigSchema
 },)
 

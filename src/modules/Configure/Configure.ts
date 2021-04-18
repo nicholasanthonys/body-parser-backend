@@ -1,5 +1,5 @@
 import { Schema, Document, model } from 'mongoose';
-import { IProject } from './Project';
+import { IProject } from '../Project/Project';
 
 
 
@@ -10,64 +10,64 @@ export interface IField extends Document {
     query: Object,
 }
 
-const fieldSchema  = new Schema({
-    param : Schema.Types.Mixed,
+const fieldSchema = new Schema({
+    param: Schema.Types.Mixed,
     header: Schema.Types.Mixed,
     body: Schema.Types.Mixed,
     query: Schema.Types.Mixed
-}, {strict : false, _id : false, id :false});
+}, { strict: false, _id: false, id: false });
 
 //* Remove _Id and _v from fieldSchema when returning to JSON
 fieldSchema.set('toJSON', {
     virtuals: true,
-    transform: (doc : any, ret : any, options : any) => {
+    transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
         delete ret._id;
         delete ret.id;
     },
 });
 
-export interface IDeleteField  extends Document {
-    header: [String],
-    body: [String],
-    query: [String],
+export interface IDeleteField extends Document {
+    header: Array<string>
+    body: Array<string>
+    query: Array<string>
 }
 
-const fieldDeleteSchema  = new Schema({
-    header:[String],
+const fieldDeleteSchema = new Schema({
+    header: [String],
     body: [String],
     query: [String]
-} ,{_id : false, id :false});
+}, { _id: false, id: false });
 
 //* Remove _Id and _v from fieldDeleteSchema when returning to JSON
 fieldDeleteSchema.set('toJSON', {
     virtuals: true,
-    transform: (doc : any, ret : any, options : any) => {
+    transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
         delete ret._id;
     },
 });
 
 
-export interface ICommand  extends Document{
+export interface ICommand extends Document {
     transform: String,
-    log_before_modify: String,
-    log_after_modify: String,
+    log_before_modify: String | null,
+    log_after_modify: String | null,
     adds: IField,
     modifies: IField,
-    deletes : IDeleteField
+    deletes: IDeleteField
 }
 
 export interface ICommandRequest extends ICommand {
-    destination_url: String,
-    destination_path: String,
-    method: String,
-    transform: String,
-    log_before_modify: String,
-    log_after_modify: String,
+    destination_url: string,
+    destination_path: string | null,
+    method: string,
+    transform: string,
+    log_before_modify: string | null,
+    log_after_modify: string | null,
     adds: IField,
     modifies: IField,
-    deletes : IDeleteField
+    deletes: IDeleteField
 }
 
 
@@ -77,40 +77,40 @@ export const commandSchema = new Schema({
         type: String,
         required: false,
     },
-    destination_path : {
-        type : String,
-        required : false
+    destination_path: {
+        type: String,
+        required: false
     },
-    
-    method : {
-        type : String,
-        required : false
+
+    method: {
+        type: String,
+        required: false
     },
-    
-    transform : {
-        type : String,
-        required : false
+
+    transform: {
+        type: String,
+        required: false
     },
-    
-    log_before_modify : {
-        type : String,
-        required : false,
-        default : ""
+
+    log_before_modify: {
+        type: String,
+        required: false,
+        default: ""
     },
-    log_after_modify : {
-        type : String,
-        required : false,
-        default : ""
+    log_after_modify: {
+        type: String,
+        required: false,
+        default: ""
     },
-    adds : fieldSchema,
-    modifies : fieldSchema,
-    deletes : fieldDeleteSchema
-},{_id : false, id :false});
+    adds: fieldSchema,
+    modifies: fieldSchema,
+    deletes: fieldDeleteSchema
+}, { _id: false, id: false });
 
 //* remove _id and _v from commandSchema when returning to JSON
 commandSchema.set('toJSON', {
     virtuals: true,
-    transform: (doc : any, ret : any, options : any) => {
+    transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
         delete ret._id;
     },
@@ -119,8 +119,8 @@ commandSchema.set('toJSON', {
 
 
 export interface IConfig extends Document {
-    Request: ICommandRequest,
-    Response: ICommand
+    request: ICommandRequest,
+    response: ICommand
 }
 
 const configSchema = new Schema({
@@ -132,12 +132,12 @@ const configSchema = new Schema({
         type: commandSchema,
         required: true,
     },
-});
+}, { strict: true });
 
 //* Remove id and _v when returning to JSON
 configSchema.set('toJSON', {
     virtuals: true,
-    transform: (doc : any, ret : any, options : any) => {
+    transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
         delete ret._id;
         delete ret.id;
@@ -146,19 +146,21 @@ configSchema.set('toJSON', {
 
 export interface IConfigure extends Document {
     _id: string;
-    config: IConfig
+    configs: Array<IConfig>
     description: String,
 
 }
 
 
 export const configureSchema = new Schema({
-    config: {
-        type: configSchema,
+    configs: {
+        type: [configSchema],
+        default : [],
         required: true,
     },
     description: {
         type: String,
+        default : null,
         required: false
     },
     date: {
@@ -177,3 +179,4 @@ configureSchema.set('toJSON', {
 })
 
 export const Configure = model<IConfigure>('Configure', configureSchema);
+export const Config = model<IConfig>('Config', configSchema);
