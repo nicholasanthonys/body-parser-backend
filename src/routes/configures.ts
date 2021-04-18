@@ -1,9 +1,7 @@
 
 import { Request, Response, Router } from 'express';
-import { Configure, IConfig, IConfigure } from '../modules/Configure/Configure';
-import { IProject, Project } from '../modules/Project/Project';
 import decodeToken from '../utils/decodeToken';
-import { storeConfigurevalidation } from '../validation/validation'
+import { storeConfigurevalidation, updateConfigurevalidation } from 'src/modules/Configure/validation/ConfigureRequestValidation'
 import ConfigureController from '../modules/Configure/controller/ConfigureController'
 import IStoreConfigureDTO from 'src/modules/Configure/DTO/StoreConfigureDTO';
 import IUpdateConfigureDTO from 'src/modules/Configure/DTO/UpdateConfigureDTO';
@@ -37,11 +35,27 @@ router.post("/", async (req: Request, res: Response) => {
 
 });
 
+// get all configure
+router.get('/project/:project_id', async (req: Request,  res: Response) => {
+    const user = decodeToken(req);
+    if (user == null) {
+        return res.status(403);
+    }
+    const { project_id } =  req.params
+    const configure = await configureController.getAll(project_id, user.id)
+    if (configure == null) {
+        return res.status(400).send({
+            message: "Project not found"
+        })
+    }
+    return res.status(200).send(configure)
+
+});
 
 //* Get Specific Configure
-router.get("/", async (req: Request, res: Response) => {
+router.get("/:configure_id/project/:project_id", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { project_id, configure_id } = req.query;
+    const { configure_id, project_id } =  req.params
     if (user == null) {
         return res.status(403);
     }
@@ -58,17 +72,15 @@ router.get("/", async (req: Request, res: Response) => {
 
 });
 
-router.put("/:configure_id", async (req: Request, res: Response) => {
+router.put("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { configure_id } = req.params;
-
     const updateConfigureDTO = req.body as IUpdateConfigureDTO
 
     if (!user) {
         return res.status(403)
     }
 
-    const { error } = storeConfigurevalidation(req.body);
+    const { error } = updateConfigurevalidation(req.body);
     if (error) {
         return res.status(400).send({
             message: error.details[0].message
@@ -76,7 +88,7 @@ router.put("/:configure_id", async (req: Request, res: Response) => {
     }
 
     try {
-        const configure = await configureController.update(updateConfigureDTO, configure_id, user.id);
+        const configure = await configureController.update(updateConfigureDTO, updateConfigureDTO.config.id, user.id);
 
         if (configure) {
             return res.status(200).send({
