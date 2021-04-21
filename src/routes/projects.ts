@@ -4,9 +4,13 @@ import { storeProjectValidation, updateProjectValidation } from "src/modules/Pro
 import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
+import { IStoreSerialorParallelDTO } from "src/modules/SerialParallel/DTO/StoreSerialorParallelDTO";
+import SerialParallelController from "src/modules/SerialParallel/Controller/SerialParallelController";
+import { storeOrUpdateSerialOrParallelValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
 const router = Router();
 
 const projectControler = new ProjectController();
+const serialParallelController = new SerialParallelController();
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
     const storeProjectDTO = req.body as IStoreProjectDTO;
@@ -25,6 +29,96 @@ router.post("/", async (req: Request, res: Response) => {
         } catch (err) {
             return res.status(400).send(err.message);
         }
+    }
+});
+
+router.post("/:project_id/serial", async (req: Request, res: Response) => {
+    const storeSerialOrParallelDTO = req.body as IStoreSerialorParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeOrUpdateSerialOrParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const serial = await serialParallelController.storeSerial(storeSerialOrParallelDTO, project_id, user.id)
+        return res.status(200).send(serial);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.put("/:project_id/serial", async (req: Request, res: Response) => {
+    const storeSerialOrParallelDTO = req.body as IStoreSerialorParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeOrUpdateSerialOrParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const serial = await serialParallelController.updateSerial(storeSerialOrParallelDTO, project_id, user.id)
+        console.log("serial is from update")
+        console.log(serial)
+        return res.status(200).send(serial);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/parallel", async (req: Request, res: Response) => {
+    const storeSerialOrParallelDTO = req.body as IStoreSerialorParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeOrUpdateSerialOrParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const parallel = await serialParallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
+        return res.status(200).send(parallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.put("/:project_id/parallel", async (req: Request, res: Response) => {
+    const storeSerialOrParallelDTO = req.body as IStoreSerialorParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeOrUpdateSerialOrParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const parallel = await serialParallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
+        return res.status(200).send(parallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
     }
 });
 
