@@ -23,6 +23,7 @@ export const serialSchema = new Schema({
     c_logics: {
         type: [cLogicSchema],
         required: true,
+        default : [],
     },
     date: {
         type: Date,
