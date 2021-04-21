@@ -13,8 +13,8 @@ interface IbaseDTO {
 
 interface ICircularResponseDTO {
     status_code: number,
-    log_before_modify: string | null,
-    log_after_modify: string | null,
+    log_before_modify: Object ,
+    log_after_modify:Object ,
     transform: string,
     adds: {
         header: Object,

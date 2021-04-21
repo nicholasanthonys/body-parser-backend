@@ -15,8 +15,8 @@ interface IConfigureRequest {
     destination_path: string | null
     method: string,
     transform: string,
-    log_before_modify:string | null ,
-    log_after_modify:  string | null,
+    log_before_modify:Object ,
+    log_after_modify: Object ,
     adds: {
         header : Object,
         body: Object
@@ -38,8 +38,8 @@ interface IConfigureRequest {
 interface IConfigureResponse {
     status_code : number,
     transform: string,
-    log_before_modify:string | null ,
-    log_after_modify:  string | null,
+    log_before_modify:Object ,
+    log_after_modify: Object ,
     adds: {
         header : Object,
         body: Object

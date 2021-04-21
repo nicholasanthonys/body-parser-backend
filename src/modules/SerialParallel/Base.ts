@@ -22,8 +22,8 @@ export const baseSchema = new Schema({
         default: {
             status_code: 200,
             transform: "ToJson",
-            log_before_modify: "",
-            log_after_modify: "",
+            log_before_modify: {},
+            log_after_modify: {},
             adds: {
                 body: {
                     message: "Circular Request"

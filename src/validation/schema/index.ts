@@ -6,8 +6,8 @@ export const configRequestSchema = Joi.object({
     destination_url: Joi.string().required(),
     destination_path: Joi.string().allow('', null),
     transform: Joi.string().required(),
-    log_before_modify: Joi.string().allow(null, ''),
-    log_after_modify: Joi.string().allow(null, ''),
+    log_before_modify: Joi.object(),
+    log_after_modify: Joi.object(),
     method: Joi.string(),
     adds: Joi.object({
         header: Joi.object().required(),
@@ -34,8 +34,8 @@ export const configRequestSchema = Joi.object({
 export const configResponseSchema = Joi.object({
     status_code: Joi.number().required(),
     transform: Joi.string().required(),
-    log_before_modify: Joi.string().allow(null, ''),
-    log_after_modify: Joi.string().allow(null, ''),
+    log_before_modify: Joi.object(),
+    log_after_modify: Joi.object(),
     adds: Joi.object({
         header: Joi.object().required(),
         body: Joi.object().required(),
