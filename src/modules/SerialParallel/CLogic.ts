@@ -1,14 +1,14 @@
 
 import { Schema, Document, model, plugin } from 'mongoose';
 import { IFinalResponseConfig } from '../Response';
-import { finalResponseSchema } from '../Response'
+import { finalResponseConfigSchema} from '../Response'
 
 
 export interface ICLogic extends Document {
     rule: Object
     data: Object | null;
     next_success: string | null;
-    response: IFinalResponseConfig
+    response: IFinalResponseConfig | null
 }
 
 export const cLogicSchema = new Schema({
@@ -29,8 +29,9 @@ export const cLogicSchema = new Schema({
         default: null
     },
     response: {
-        type: finalResponseSchema,
-        required: true
+        type: finalResponseConfigSchema,
+        default : null,
+        required:false 
     },
     date: {
         type: Date,
