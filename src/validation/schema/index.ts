@@ -39,15 +39,15 @@ export const configResponseSchema = Joi.object({
     adds: Joi.object({
         header: Joi.object().required(),
         body: Joi.object().required(),
-    }),
+    }).required(),
     modifies: Joi.object({
         header: Joi.object().required(),
         body: Joi.object().required(),
-    }),
+    }).required(),
     deletes: Joi.object({
-        header: Joi.array().items(Joi.string()),
-        body: Joi.array().items(Joi.string()),
-    })
+        header: Joi.array().items(Joi.string()).required(),
+        body: Joi.array().items(Joi.string()).required(),
+    }).required()
 
 })
 
