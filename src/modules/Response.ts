@@ -6,9 +6,15 @@ export interface IFieldFinalResponse extends Document {
 }
 
 const fieldFinalResponseSchema = new Schema({
-    header: Schema.Types.Mixed,
-    body: Schema.Types.Mixed,
-}, { strict: false, _id: false, id: false, });
+    header: {
+        type: Schema.Types.Mixed,
+        default: {}
+    },
+    body: {
+        type: Schema.Types.Mixed,
+        default: {}
+    }
+}, {  _id: false, id: false, });
 
 //* Remove _Id and _v from fieldSchema when returning to JSON
 fieldFinalResponseSchema.set('toJSON', {
@@ -43,7 +49,7 @@ fieldFinalResponseDeleteSchema.set('toJSON', {
 
 
 export interface IFinalResponseConfig extends Document {
-    status_code : number,
+    status_code: number,
     transform: string,
     log_before_modify: string | null,
     log_after_modify: string | null,
@@ -53,10 +59,10 @@ export interface IFinalResponseConfig extends Document {
 }
 
 
- export const finalResponseConfigSchema = new Schema({
-    status_code  : {
-        type : String,
-        required  :true,
+export const finalResponseConfigSchema = new Schema({
+    status_code: {
+        type: String,
+        required: true,
     },
     transform: {
         type: String,
@@ -73,9 +79,27 @@ export interface IFinalResponseConfig extends Document {
         required: false,
         default: ""
     },
-    adds: fieldFinalResponseSchema,
-    modifies: fieldFinalResponseSchema,
-    delete: fieldFinalResponseDeleteSchema
+    adds: {
+        type: fieldFinalResponseSchema,
+        default: {
+            header : {},
+            body : {},
+        },
+    },
+    modifies: {
+        type: fieldFinalResponseSchema,
+        default: {
+            header : {},
+            body : {}
+        }
+    },
+    deletes: {
+        type: fieldFinalResponseSchema,
+        default: {
+            header : [],
+            body : [],
+        },
+    }
 }, { _id: false, id: false });
 
 //* remove _id and _v from finalResponseConfigSchema when returning to JSON
@@ -87,22 +111,7 @@ finalResponseConfigSchema.set('toJSON', {
     },
 });
 
-export interface IFinalResponse extends Document {
-    response : IFinalResponseConfig
-}
-
-export const finalResponseSchema = new Schema({
-    response : finalResponseConfigSchema
-},)
-
-finalResponseSchema.set('toJSON', {
-    virtuals: true,
-    transform: (doc: any, ret: any, options: any) => {
-        delete ret.__v;
-        delete ret._id;
-        delete ret.id;
-    },
-});
 
 
-export const FinalResponse = model<IFinalResponse>('FinalResponse', finalResponseSchema);
+
+export const FinalResponse = model<IFinalResponseConfig>('FinalResponse', finalResponseConfigSchema);
