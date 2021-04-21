@@ -1,4 +1,3 @@
-import { boolean } from 'joi';
 import { Schema, Document, model } from 'mongoose';
 import { finalResponseConfigSchema } from 'src/modules/Response';
 import {  cLogicSchema, ICLogic } from './CLogic';
@@ -8,16 +7,14 @@ import { IFinalResponseConfig } from '../Response';
 
 export interface IParallel extends Document {
     configures: Array<IConfigureFile>
-    nextFailure: IFinalResponseConfig
-    cLogics: Array<ICLogic>
+    next_failure: IFinalResponseConfig
+    c_logics: Array<ICLogic>
 }
 
 export const parallelSchema = new Schema({
     configures: {
         type: [configureFileSchema],
         required: true,
-        
-
     },
     next_failure: {
         type: finalResponseConfigSchema,
