@@ -8,7 +8,7 @@ export const storeConfigurevalidation = (data: Request): ValidationResult => {
             request: configRequestSchema.required(),
             response: configResponseSchema.required(),
 
-        })
+        }).required()
 
     })
     return schema.validate(data)
@@ -24,7 +24,7 @@ export const updateConfigurevalidation = (data: Request): ValidationResult => {
             request: configRequestSchema.required(),
             response: configResponseSchema.required(),
 
-        })
+        }).required()
 
     })
     return schema.validate(data)

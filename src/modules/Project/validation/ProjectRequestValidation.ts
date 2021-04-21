@@ -7,7 +7,7 @@ export const storeProjectValidation = (data: Request): ValidationResult => {
         base: Joi.object({
             project_max_circular: Joi.number().required(),
             circular_response: configResponseSchema.required()
-        })
+        }).required()
     })
     return schema.validate(data)
 }
@@ -20,7 +20,7 @@ export const updateProjectValidation = (data: Request): ValidationResult => {
         base: Joi.object({
             project_max_circular: Joi.number().required(),
             circular_response: configResponseSchema.required()
-        })
+        }).required()
 
     })
     return schema.validate(data)
