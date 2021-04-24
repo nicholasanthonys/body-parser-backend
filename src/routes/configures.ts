@@ -106,12 +106,12 @@ router.put("/", async (req: Request, res: Response) => {
 
 router.delete("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    const { projectId, configureId } = req.query;
+    const {  project_id,  configure_id } = req.query;
     if (!user) {
         return res.sendStatus(403)
     }
     try {
-        const isSuccess = await configureController.delete(projectId as string, configureId as string, user.id)
+        const isSuccess = await configureController.delete(project_id as string, configure_id as string, user.id)
         if (isSuccess) {
             return res.status(200).send({ "message": "Configure deleted" });
         }
