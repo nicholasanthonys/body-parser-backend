@@ -3,7 +3,7 @@ import Joi, { ValidationResult } from 'joi';
 export const storeOrUpdateParallelValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
         configures: Joi.array().items({
-            file_name: Joi.string().required(),
+            configure_id: Joi.string().required(),
             alias: Joi.string().required(),
         }).required(),
         c_logics: Joi.array().items({
@@ -21,7 +21,7 @@ export const storeOrUpdateParallelValidation = (data: Request): ValidationResult
 export const storeOrUpdateSerialValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
         configures: Joi.array().items({
-            file_name: Joi.string().required(),
+            configure_id: Joi.string().required(),
             alias: Joi.string().required(),
             c_logics: Joi.array().items({
                 rule: Joi.object().allow(null),

@@ -4,7 +4,7 @@ export interface IStoreSerialDTO {
 
 
 interface configureFileSerialDTO {
-    file_name: string,
+    configure_id: string,
     alias: string,
     next_failure: IResponseDTO,
     c_logics: Array<CLogicItemDTO>

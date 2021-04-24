@@ -6,12 +6,15 @@ import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
 import { IStoreParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
 import {IStoreSerialDTO} from "src/modules/SerialParallel/DTO/StoreSerialDTO"
-import SerialParallelController from "src/modules/SerialParallel/Controller/SerialParallelController";
+import ParallelController from "src/modules/SerialParallel/Controller/ParallelController";
 import { storeOrUpdateParallelValidation, storeOrUpdateSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
+import SerialController from "src/modules/SerialParallel/Controller/SerialController";
 const router = Router();
 
 const projectControler = new ProjectController();
-const serialParallelController = new SerialParallelController();
+const parallelController = new ParallelController();
+const serialController = new SerialController
+
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
     const storeProjectDTO = req.body as IStoreProjectDTO;
@@ -32,6 +35,21 @@ router.post("/", async (req: Request, res: Response) => {
         }
     }
 });
+router.get("/:project_id/serial", async (req: Request, res: Response) => {
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+
+    const serial = await serialController.getSerial(project_id, user.id);
+    if(!serial){
+        return res.status(400).send({
+            message : "Project not found"
+        })
+    }
+    return res.status(200).send(serial)
+});
 
 router.post("/:project_id/serial", async (req: Request, res: Response) => {
     const storeSerialDTO = req.body as IStoreSerialDTO;
@@ -48,7 +66,7 @@ router.post("/:project_id/serial", async (req: Request, res: Response) => {
     }
 
     try {
-        const serial = await serialParallelController.storeSerial(storeSerialDTO, project_id, user.id)
+        const serial = await serialController.storeSerial(storeSerialDTO, project_id, user.id)
         if(!serial){
             return res.status(400).send({
                 message : "No Project found"
@@ -62,13 +80,13 @@ router.post("/:project_id/serial", async (req: Request, res: Response) => {
 });
 
 router.put("/:project_id/serial", async (req: Request, res: Response) => {
-    const storeSerialOrParallelDTO = req.body as IStoreParallelDTO;
+    const storeSerialOrParallelDTO = req.body as IStoreSerialDTO;
     const { project_id } = req.params;
     const user = decodeToken(req);
     if (!user) {
         return res.sendStatus(403);
     }
-    const { error } = storeOrUpdateParallelValidation(req.body);
+    const { error } = storeOrUpdateSerialValidation(req.body);
     if (error) {
         return res.status(400).send({
             message: error.message
@@ -76,7 +94,7 @@ router.put("/:project_id/serial", async (req: Request, res: Response) => {
     }
 
     try {
-        const serial = await serialParallelController.updateSerial(storeSerialOrParallelDTO, project_id, user.id)
+        const serial = await serialController.updateSerial(storeSerialOrParallelDTO, project_id, user.id)
         if(!serial){
             return res.status(400).send({
                 message : "No Project found"
@@ -86,6 +104,22 @@ router.put("/:project_id/serial", async (req: Request, res: Response) => {
     } catch (err) {
         return res.status(400).send(err.message);
     }
+});
+
+router.get("/:project_id/parallel", async (req: Request, res: Response) => {
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+
+    const parallel = await parallelController.getParallel(project_id, user.id);
+    if(!parallel){
+        return res.status(400).send({
+            message : "Project not found"
+        })
+    }
+    return res.status(200).send(parallel)
 });
 
 router.post("/:project_id/parallel", async (req: Request, res: Response) => {
@@ -103,7 +137,7 @@ router.post("/:project_id/parallel", async (req: Request, res: Response) => {
     }
 
     try {
-        const parallel = await serialParallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
+        const parallel = await parallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
         if(!parallel){
             return res.status(400).send({
                 message : "No Project found"
@@ -130,7 +164,7 @@ router.put("/:project_id/parallel", async (req: Request, res: Response) => {
     }
 
     try {
-        const parallel = await serialParallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
+        const parallel = await parallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
         if(!parallel){
             return res.status(400).send({
                 message : "No Project found"
@@ -151,16 +185,6 @@ router.get("/", async (req: Request, res: Response) => {
         return res.status(200).send(projects);
     }
 });
-
-// router.get('/serial-parallel', async (req : Request, res : Response)=> {
-//     const user = decodeToken(req);
- 
-//     if(!user){
-//         return res.sendStatus(403)
-//     }
-
-
-// })
 
 //* Get project detail and its configures
 router.get("/:id", async (req: Request, res: Response) => {

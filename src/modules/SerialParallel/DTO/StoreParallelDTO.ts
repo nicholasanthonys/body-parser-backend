@@ -6,7 +6,7 @@ export interface IStoreParallelDTO {
 
 
 interface configureFileParallelDTO {
-    file_name: string,
+    configure_id: string,
     alias: string,
 }
 

@@ -2,12 +2,12 @@ import { Schema, Document, model } from 'mongoose';
 
 
 export interface IConfigureFileParallel extends Document {
-    file_name: String
+    configure_id: String
     alias: String
 }
 
 export const configureFileParallelSchema = new Schema({
-    file_name: {
+    configure_id: {
         type: Schema.Types.String,
         required: true,
     },
