@@ -39,16 +39,16 @@ export const responseSchema = Joi.object({
     status_code: Joi.number().required(),
     transform: Joi.string().required(),
     adds: Joi.object({
-        header: Joi.object().required(),
-        body: Joi.object().required(),
+        header: Joi.object(),
+        body: Joi.object(),
     }).required(),
     modifies: Joi.object({
-        header: Joi.object().required(),
-        body: Joi.object().required(),
+        header: Joi.object(),
+        body: Joi.object(),
     }).required(),
     deletes: Joi.object({
-        header: Joi.array().items(Joi.string()).required(),
-        body: Joi.array().items(Joi.string()).required(),
+        header: Joi.array().items(Joi.string()),
+        body: Joi.array().items(Joi.string()),
     }).required()
 
 })
