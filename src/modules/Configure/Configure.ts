@@ -1,5 +1,6 @@
 import { Schema, Document, model } from 'mongoose';
 import { IProject } from '../Project/Project';
+import { finalResponseConfigSchema, IFinalResponseConfig } from '../Response';
 
 
 
@@ -11,10 +12,22 @@ export interface IField extends Document {
 }
 
 const fieldSchema = new Schema({
-    param: Schema.Types.Mixed,
-    header: Schema.Types.Mixed,
-    body: Schema.Types.Mixed,
-    query: Schema.Types.Mixed
+    param: {
+        type : Schema.Types.Mixed,
+        default : {},
+    } ,
+    header: {
+        type : Schema.Types.Mixed,
+        default : {},
+    } ,
+    body: {
+        type : Schema.Types.Mixed,
+        default : {},
+    } ,
+    query: {
+        type : Schema.Types.Mixed,
+        default : {},
+    } ,
 }, { strict: false, _id: false, id: false });
 
 //* Remove _Id and _v from fieldSchema when returning to JSON
@@ -48,17 +61,7 @@ fieldDeleteSchema.set('toJSON', {
     },
 });
 
-
-export interface ICommand extends Document {
-    transform: String,
-    log_before_modify: Object ,
-    log_after_modify: Object ,
-    adds: IField,
-    modifies: IField,
-    deletes: IDeleteField
-}
-
-export interface ICommandRequest extends ICommand {
+export interface ICommandRequest extends Document {
     destination_url: string,
     destination_path: string | null,
     method: string,
@@ -72,36 +75,37 @@ export interface ICommandRequest extends ICommand {
 
 
 
-export const commandSchema = new Schema({
+export const requestConfigSchema = new Schema({
     destination_url: {
         type: String,
-        required: false,
+        required: true,
     },
     destination_path: {
         type: String,
-        required: false
+        required: true,
+        default : ''
     },
 
     method: {
         type: String,
-        required: false
+        required: true
     },
 
     transform: {
         type: Object,
-        required: false,
-        default : {}
+        required: true,
+        default : "ToJson"
     },
 
     log_before_modify: {
         type: Object,
-        required: false,
+        required: true,
         default: {}
     },
     log_after_modify: {
-        type: String,
-        required: false,
-        default: ""
+        type: Object,
+        required: true,
+        default: {} 
     },
     adds: fieldSchema,
     modifies: fieldSchema,
@@ -109,7 +113,7 @@ export const commandSchema = new Schema({
 }, { _id: false, id: false });
 
 //* remove _id and _v from commandSchema when returning to JSON
-commandSchema.set('toJSON', {
+requestConfigSchema.set('toJSON', {
     virtuals: true,
     transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
@@ -120,17 +124,23 @@ commandSchema.set('toJSON', {
 
 
 export interface IConfig extends Document {
+    description : String,
     request: ICommandRequest,
-    response: ICommand
+    response: IFinalResponseConfig
 }
 
 const configSchema = new Schema({
+    description : {
+        type : Schema.Types.String,
+        required : false,
+        default : ''
+    },
     request: {
-        type: commandSchema,
-        required: false
+        type: requestConfigSchema,
+        required:true 
     },
     response: {
-        type: commandSchema,
+        type: finalResponseConfigSchema, 
         required: true,
     },
 }, { strict: true });
@@ -141,14 +151,12 @@ configSchema.set('toJSON', {
     transform: (doc: any, ret: any, options: any) => {
         delete ret.__v;
         delete ret._id;
-        delete ret.id;
     },
 });
 
 export interface IConfigure extends Document {
     _id: string;
     configs: Array<IConfig>
-    description: String,
 
 }
 
@@ -158,11 +166,6 @@ export const configureSchema = new Schema({
         type: [configSchema],
         default : [],
         required: true,
-    },
-    description: {
-        type: String,
-        default : null,
-        required: false
     },
     date: {
         type: Date,
