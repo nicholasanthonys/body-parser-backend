@@ -66,21 +66,23 @@ export const finalResponseConfigSchema = new Schema({
     },
     transform: {
         type: String,
-        required: false
+        required:true,
+        default : "ToJson" 
     },
 
     log_before_modify: {
         type: Object,
-        required: false,
+        required: true,
         default: {}
     },
     log_after_modify: {
         type: Object,
-        required: false,
+        required: true,
         default:{} 
     },
     adds: {
         type: fieldFinalResponseSchema,
+        required : true,
         default: {
             header : {},
             body : {},
@@ -88,6 +90,7 @@ export const finalResponseConfigSchema = new Schema({
     },
     modifies: {
         type: fieldFinalResponseSchema,
+        required : true,
         default: {
             header : {},
             body : {}
@@ -95,6 +98,7 @@ export const finalResponseConfigSchema = new Schema({
     },
     deletes: {
         type: fieldFinalResponseSchema,
+        required : true,
         default: {
             header : [],
             body : [],
