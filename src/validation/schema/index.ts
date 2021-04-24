@@ -13,18 +13,21 @@ export const configRequestSchema = Joi.object({
         header: Joi.object().required(),
         body: Joi.object().required(),
         query: Joi.object().required(),
+        param: Joi.object().required(),
 
     }),
     modifies: Joi.object({
         header: Joi.object().required(),
         body: Joi.object().required(),
         query: Joi.object().required(),
+        param: Joi.object().required()
 
     }),
     deletes: Joi.object({
         header: Joi.array().items(Joi.string()),
         body: Joi.array().items(Joi.string()),
         query: Joi.array().items(Joi.string()),
+        param: Joi.array().items(Joi.string()),
 
     })
 })
