@@ -1,9 +1,9 @@
 export default interface IStoreConfigureDTO {
-    project_id : string,
-    description : string,
-    config : {
-        request : IConfigureRequest,
-        response : IConfigureResponse
+    project_id: string,
+    config: {
+        description: string,
+        request: IConfigureRequest,
+        response: IConfigureResponse
     }
 }
 
@@ -13,17 +13,17 @@ interface IConfigureRequest {
     destination_path: string | null
     method: string,
     transform: string,
-    log_before_modify:Object ,
-    log_after_modify:  Object ,
+    log_before_modify: Object,
+    log_after_modify: Object,
     adds: {
-        header : Object,
+        header: Object,
         body: Object
-        query : Object,
+        query: Object,
     },
     modifies: {
-        header : Object,
+        header: Object,
         body: Object
-        query : Object
+        query: Object
     },
     deletes: {
         header: Array<string>,
@@ -34,19 +34,19 @@ interface IConfigureRequest {
 }
 
 interface IConfigureResponse {
-    status_code : number,
+    status_code: number,
     transform: string,
-    log_before_modify:Object ,
-    log_after_modify: Object ,
+    log_before_modify: Object,
+    log_after_modify: Object,
     adds: {
-        header : Object,
+        header: Object,
         body: Object
-        query : Object,
+        query: Object,
     },
     modifies: {
-        header : Object,
+        header: Object,
         body: Object
-        query : Object
+        query: Object
     },
     deletes: {
         header: Array<string>,

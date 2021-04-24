@@ -1,29 +1,20 @@
 import { Schema, Document, model } from 'mongoose';
 import {  cLogicSchema, ICLogic } from './CLogic';
-import { configureFileSchema, IConfigureFile } from './ConfigureFile';
+import { configureFileSerialSchema, IConfigureFileSerial } from './ConfigureFileSerial';
 import { IFinalResponseConfig, finalResponseConfigSchema} from '../Response';
 
 
 export interface ISerial extends Document {
-    configures: Array<IConfigureFile>
+    configures: Array<IConfigureFileSerial>
     next_failure: IFinalResponseConfig
     c_logics: Array<ICLogic>
 }
 
 export const serialSchema = new Schema({
     configures: {
-        type: [configureFileSchema],
+        type: [configureFileSerialSchema],
         required: true,
 
-    },
-    next_failure: {
-        type: finalResponseConfigSchema,
-        required: true,
-    },
-    c_logics: {
-        type: [cLogicSchema],
-        required: true,
-        default : [],
     },
     date: {
         type: Date,

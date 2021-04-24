@@ -1,36 +1,37 @@
 
 import ProjectController from 'src/modules/Project/Controller/ProjectController'
 import { IProject, Project } from 'src/modules/Project/Project';
-import { ConfigureFile } from 'src/modules/SerialParallel/ConfigureFile'
+import { ConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSerial'
 import { CLogic } from 'src/modules/SerialParallel/CLogic'
-import { IStoreSerialorParallelDTO } from '../DTO/StoreSerialorParallelDTO'
+import { IStoreParallelDTO} from '../DTO/StoreParallelDTO'
+import {IStoreSerialDTO} from '../DTO/StoreSerialDTO'
 import { IParallel } from '../Parallel';
 import { ISerial, Serial } from '../Serial';
 import { Config } from 'src/modules/Configure/Configure';
+import { FinalResponse } from 'src/modules/Response';
 export default class SerialParallelController {
 
     projectController: ProjectController = new ProjectController()
 
-    async storeSerial(storeSerialOrParallelDTO: IStoreSerialorParallelDTO, projectId: string, userId: string): Promise<ISerial | null> {
+    async storeSerial(storeSerialDTO: IStoreSerialDTO, projectId: string, userId: string): Promise<ISerial | null> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             console.log("project is null");
             return null;
         }
+        
+        project.serial = new Serial();
 
         project.serial = new Serial({
-            configures: storeSerialOrParallelDTO.configures,
-            next_failure: storeSerialOrParallelDTO.next_failure,
-            c_logics: storeSerialOrParallelDTO.c_logics
+            configures: storeSerialDTO.configures 
         })
-
         await project.save();
         return project.serial;
 
 
     }
 
-    async storeParallel(storeSerialOrParallelDTO: IStoreSerialorParallelDTO, projectId: string, userId: string): Promise<IParallel | null> {
+    async storeParallel(storeSerialOrParallelDTO: IStoreParallelDTO, projectId: string, userId: string): Promise<IParallel | null> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null;
@@ -60,7 +61,7 @@ export default class SerialParallelController {
         return project.parallel
     }
 
-    async updateParallel(storeSerialOrParallelDTO: IStoreSerialorParallelDTO, projectId: string, userId: string): Promise<IParallel | null> {
+    async updateParallel(storeSerialOrParallelDTO: IStoreParallelDTO, projectId: string, userId: string): Promise<IParallel | null> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null;
@@ -69,7 +70,7 @@ export default class SerialParallelController {
         if (project.parallel != null) {
             project.parallel.configures = [];
             storeSerialOrParallelDTO.configures.forEach(element => {
-                let configureFile = new ConfigureFile({
+                let configureFile = new ConfigureFileSerial({
                     file_name: element.file_name,
                     alias: element.alias
                 })
@@ -105,7 +106,7 @@ export default class SerialParallelController {
 
 
 
-    async updateSerial(storeSerialOrParallelDTO: IStoreSerialorParallelDTO, projectId: string, userId: string): Promise<ISerial | null> {
+    async updateSerial(storeSerialOrParallelDTO: IStoreParallelDTO, projectId: string, userId: string): Promise<ISerial | null> {
         let project = await this.projectController.show(projectId, userId);
         console.log("project i d")
         console.log(projectId)
@@ -118,7 +119,7 @@ export default class SerialParallelController {
             console.log("serial is not null");
             project.serial.configures = [];
             storeSerialOrParallelDTO.configures.forEach(element => {
-                let configureFile = new ConfigureFile({
+                let configureFile = new ConfigureFileSerial({
                     file_name: element.file_name,
                     alias: element.alias
                 })

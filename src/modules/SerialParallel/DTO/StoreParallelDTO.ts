@@ -1,11 +1,11 @@
-export interface IStoreSerialorParallelDTO {
-    configures: Array<configureFileDTO>
+export interface IStoreParallelDTO {
+    configures: Array<configureFileParallelDTO>
     next_failure: IResponseDTO,
     c_logics: Array<CLogicItemDTO>
 }
 
 
-interface configureFileDTO {
+interface configureFileParallelDTO {
     file_name: string,
     alias: string,
 }

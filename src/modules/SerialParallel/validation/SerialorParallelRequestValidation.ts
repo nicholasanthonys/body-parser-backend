@@ -1,6 +1,6 @@
 import Joi, { ValidationResult } from 'joi';
 
-export const storeOrUpdateSerialOrParallelValidation = (data: Request): ValidationResult => {
+export const storeOrUpdateParallelValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
         configures: Joi.array().items({
             file_name: Joi.string().required(),
@@ -14,6 +14,23 @@ export const storeOrUpdateSerialOrParallelValidation = (data: Request): Validati
         }).required(),
         next_failure: responseSchema.required().required(),
 
+    })
+    return schema.validate(data)
+}
+
+export const storeOrUpdateSerialValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        configures: Joi.array().items({
+            file_name: Joi.string().required(),
+            alias: Joi.string().required(),
+            c_logics: Joi.array().items({
+                rule: Joi.object().allow(null),
+                data: Joi.object().allow(null),
+                next_success: Joi.string().allow(null),
+                response: responseSchema.allow(null)
+            }).required(),
+            next_failure: responseSchema.required().required(),
+        }).required(),
     })
     return schema.validate(data)
 }

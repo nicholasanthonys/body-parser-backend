@@ -1,19 +1,19 @@
 import { Schema, Document, model } from 'mongoose';
 import { finalResponseConfigSchema } from 'src/modules/Response';
 import {  cLogicSchema, ICLogic } from './CLogic';
-import { configureFileSchema, IConfigureFile } from './ConfigureFile';
+import { configureFileParallelSchema, IConfigureFileParallel} from './ConfigureFileParallel';
 import { IFinalResponseConfig } from '../Response';
 
 
 export interface IParallel extends Document {
-    configures: Array<IConfigureFile>
+    configures: Array<IConfigureFileParallel>
     next_failure: IFinalResponseConfig
     c_logics: Array<ICLogic>
 }
 
 export const parallelSchema = new Schema({
     configures: {
-        type: [configureFileSchema],
+        type: [configureFileParallelSchema],
         required: true,
     },
     next_failure: {
