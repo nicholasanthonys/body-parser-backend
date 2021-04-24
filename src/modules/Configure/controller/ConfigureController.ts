@@ -11,10 +11,10 @@ export default class ConfigureController {
         // project.configures.confi
         if (project) {
             const newConfig = new Config({
+                description : storeConfigureDTO.config.description,
                 request: storeConfigureDTO.config.request,
                 response: storeConfigureDTO.config.response
             })
-            project.configures.description = storeConfigureDTO.description
             project.configures.configs.push(newConfig);
         
             await project.save();
@@ -48,18 +48,10 @@ export default class ConfigureController {
 
     async update(updateProjectDTO: IUpdateConfigureDTO, configureId: string, userId: string): Promise<IConfig| null> {
         const project = await Project.findOne({ _id: updateProjectDTO.project_id, userId }) as IProject
-        console.log("project is ")
-        console.log(project)
         if (project) {
-            console.log("project configures is")
             let index = project.configures.configs.findIndex((element) => element._id == configureId);
-            console.log("update configure")
-            console.log(project.configures)
-            console.log("index is " + index)
             if (index >= 0) {
-                project.configures.description = updateProjectDTO.description
-
-                console.log(updateProjectDTO.config.request.destination_url)
+                project.configures.configs[index].description = updateProjectDTO.config.description
 
                 project.configures.configs[index].request.destination_url = updateProjectDTO.config.request.destination_url
                 project.configures.configs[index].request.destination_path = updateProjectDTO.config.request.destination_path
@@ -82,17 +74,20 @@ export default class ConfigureController {
                 project.configures.configs[index].request.deletes.query = updateProjectDTO.config.request.deletes.query
 
 
+                project.configures.configs[index].response.status_code= updateProjectDTO.config.response.status_code
+
+                project.configures.configs[index].response.transform = updateProjectDTO.config.response.transform
+                project.configures.configs[index].response.log_before_modify = updateProjectDTO.config.response.log_before_modify
+                project.configures.configs[index].response.log_after_modify = updateProjectDTO.config.response.log_after_modify
+
                 project.configures.configs[index].response.adds.header = updateProjectDTO.config.response.adds.header
                 project.configures.configs[index].response.adds.body = updateProjectDTO.config.response.adds.body
-                project.configures.configs[index].response.adds.query = updateProjectDTO.config.response.adds.query
 
                 project.configures.configs[index].response.modifies.header = updateProjectDTO.config.response.modifies.header
                 project.configures.configs[index].response.modifies.body = updateProjectDTO.config.response.modifies.body
-                project.configures.configs[index].response.modifies.query = updateProjectDTO.config.request.modifies.query
 
                 project.configures.configs[index].response.deletes.header = updateProjectDTO.config.request.deletes.header
                 project.configures.configs[index].response.deletes.body = updateProjectDTO.config.request.deletes.body
-                project.configures.configs[index].response.deletes.query = updateProjectDTO.config.request.deletes.query
 
 
                 const updatedProject = await project.save();
