@@ -1,21 +1,31 @@
+import { IStoreSingleCLogicItemDTO } from "./CLogicDTO";
+
 export interface IStoreSerialDTO {
-    configures: Array<configureFileSerialDTO>
+    configures: Array<ISerialConfigDTO>
 }
 
 
-interface configureFileSerialDTO {
+export interface ISerialConfigDTO {
     configure_id: string,
     alias: string,
     next_failure: IResponseDTO,
-    c_logics: Array<CLogicItemDTO>
+    c_logics : Array<IStoreSingleCLogicItemDTO>
 }
 
-interface CLogicItemDTO {
-    rule: Object,
-    data: Object,
-    next_success: string | null,
-    response: IResponseDTO
+
+export interface IStoreSingleSerialConfigDTO {
+    configure_id: string,
+    alias: string,
+    next_failure: IResponseDTO,
 }
+export interface IUpdateSingleConfigureFileSerialDTO {
+    id : string,
+    configure_id: string,
+    alias: string,
+    next_failure: IResponseDTO,
+}
+
+
 
 interface IResponseDTO {
     status_code: number,

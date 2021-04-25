@@ -4,10 +4,10 @@ import { finalResponseConfigSchema,IFinalResponseConfig} from '../Response';
 
 
 export interface IConfigureFileSerial extends Document {
-    configure_id: String
-    alias: String
-    cLogics : Array<ICLogic>
-    nextFailure : IFinalResponseConfig
+    configure_id: string
+    alias: string
+    c_logics : Array<ICLogic>
+    next_failure : IFinalResponseConfig
 }
 
 export const configureFileSerialSchema = new Schema({

@@ -1,7 +1,7 @@
 
 import { Schema, Document, model } from 'mongoose';
 import { IFinalResponseConfig } from '../Response';
-import { finalResponseConfigSchema} from '../Response'
+import { finalResponseConfigSchema } from '../Response'
 
 
 export interface ICLogic extends Document {
@@ -16,22 +16,21 @@ export const cLogicSchema = new Schema({
         type: Schema.Types.Mixed,
         required: true,
         default: {}
-
     },
     data: {
         type: Schema.Types.Mixed,
-        required: false,
-        default: null
+        required: true,
+        default: {},
     },
     next_success: {
         type: String,
-        required: false,
-        default: '' ,
+        required: true,
+        default: '',
     },
     response: {
         type: finalResponseConfigSchema,
-        default : null,
-        required:false 
+        default: null,
+        required: false
     },
     date: {
         type: Date,

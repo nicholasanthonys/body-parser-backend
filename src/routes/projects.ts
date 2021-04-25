@@ -5,13 +5,14 @@ import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
-import { IStoreSerialDTO } from "src/modules/SerialParallel/DTO/StoreSerialDTO"
+import { IStoreSerialDTO , ISerialConfigDTO, IUpdateSingleConfigureFileSerialDTO, IStoreSingleSerialConfigDTO} from "src/modules/SerialParallel/DTO/StoreSerialDTO"
 import ParallelController from "src/modules/SerialParallel/Controller/ParallelController";
-import { responseSchema, storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleConfigParallelValidation, updateSingleCLogicParallelValidation, updateSingleConfigParallelValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
+import { responseSchema, storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleCLogicSerialValidation, storeSingleConfigParallelValidation, storeSingleConfigSerialValidation, updateSingleCLogicParallelValidation, updateSingleCLogicSerialValidation, updateSingleConfigParallelValidation, updateSingleConfigSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
 import SerialController from "src/modules/SerialParallel/Controller/SerialController";
-import { IUpdateSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/UpdateSerialDTO";
+import { IUpdateSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/UpdateParallelDTO";
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from "src/modules/SerialParallel/DTO/CLogicDTO";
 import { IResponseDTO } from "src/modules/SerialParallel/DTO/StoreResponseDTO";
+
 const router = Router();
 
 const projectControler = new ProjectController();
@@ -77,6 +78,119 @@ router.post("/:project_id/serial", async (req: Request, res: Response) => {
         }
 
         return res.status(200).send(serial);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/serial/config/new", async (req: Request, res: Response) => {
+    const storeSingleConfigSerialDTO = req.body as IStoreSingleSerialConfigDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeSingleConfigSerialValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const serialConfig = await serialController.storeSingleConfig(storeSingleConfigSerialDTO, project_id, user.id)
+        if (!serialConfig) {
+            return res.status(400).send({
+                message: "No Project found"
+            })
+        }
+
+        return res.status(200).send(serialConfig);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+
+router.put("/:project_id/serial/config", async (req: Request, res: Response) => {
+    const updateSingleConfigSerialDTO = req.body as IUpdateSingleConfigureFileSerialDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = updateSingleConfigSerialValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const serialConfig = await serialController.updateSingleConfig(updateSingleConfigSerialDTO, project_id, user.id)
+        if (!serialConfig) {
+            return res.status(400).send({
+                message: "No Project found"
+            })
+        }
+
+        return res.status(200).send(serialConfig);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/serial/config/:config_id/clogic/new", async (req: Request, res: Response) => {
+    const storeSingleCLogicDTO = req.body as IStoreSingleCLogicItemDTO;
+    const { project_id, config_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeSingleCLogicSerialValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const cLogic = await serialController.storeSingleCLogic(storeSingleCLogicDTO, project_id, user.id, config_id)
+        if (!cLogic) {
+            return res.status(400).send({
+                message: "No Project found"
+            })
+        }
+
+        return res.status(200).send(cLogic);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.put("/:project_id/serial/config/:config_id/clogic", async (req: Request, res: Response) => {
+    const updateSingleCLogicDTO = req.body as IUpdateSingleCLogicItemDTO;
+    const { project_id, config_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = updateSingleCLogicSerialValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const cLogic = await serialController.updateSingleCLogic(updateSingleCLogicDTO, project_id, user.id, config_id)
+        if (!cLogic) {
+            return res.status(400).send({
+                message: "No Project found"
+            })
+        }
+
+        return res.status(200).send(cLogic);
     } catch (err) {
         return res.status(400).send(err.message);
     }

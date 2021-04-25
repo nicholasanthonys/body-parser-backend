@@ -7,7 +7,7 @@ import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from '../DTO/StorePa
 import { IParallel, Parallel } from '../Parallel';
 import { ConfigureFileParallel, IConfigureFileParallel } from '../ConfigureFileParallel';
 
-import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateSerialDTO';
+import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateParallelDTO';
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO'
 import { FinalResponse, IFinalResponseConfig } from 'src/modules/Response';
 import { IResponseDTO } from '../DTO/StoreResponseDTO';
@@ -184,7 +184,7 @@ export default class ParallelController {
     async deleteParallel(projectId: string, userId: string): Promise<boolean> {
         const project = await Project.findOne({ _id: projectId, userId }) as IProject;
         if (project) {
-            project.parallel = null;
+            project.parallel.delete();
             await project.save();
             return true
         }

@@ -35,6 +35,46 @@ export const storeOrUpdateSerialValidation = (data: Request): ValidationResult =
     return schema.validate(data)
 }
 
+export const storeSingleConfigSerialValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        configure_id: Joi.string().required(),
+        alias: Joi.string().required(),
+        next_failure: responseSchema.required().required(),
+    })
+    return schema.validate(data)
+}
+
+export const updateSingleConfigSerialValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        id : Joi.string().required(),
+        configure_id: Joi.string().required(),
+        alias: Joi.string().required(),
+        next_failure: responseSchema.required().required(),
+    })
+    return schema.validate(data)
+}
+
+export const storeSingleCLogicSerialValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        rule: Joi.object().allow(null),
+        data: Joi.object().allow(null),
+        next_success: Joi.string().allow(null),
+        response: responseSchema.allow(null)
+    })
+    return schema.validate(data)
+}
+
+export const updateSingleCLogicSerialValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        id : Joi.string().required(),
+        rule: Joi.object().allow(null),
+        data: Joi.object().allow(null),
+        next_success: Joi.string().allow(null),
+        response: responseSchema.allow(null)
+    })
+    return schema.validate(data)
+}
+
 export const storeSingleConfigParallelValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
         configure_id: Joi.string().required(),

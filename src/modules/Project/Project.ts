@@ -14,8 +14,8 @@ export interface IProject extends Document {
     description: string;
     date: Date,
     configures: IConfigure,
-    serial: ISerial | null,
-    parallel: IParallel | null,
+    serial: ISerial ,
+    parallel: IParallel  ,
     base: IBase
 }
 
