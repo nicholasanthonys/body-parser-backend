@@ -10,17 +10,17 @@ export const configRequestSchema = Joi.object({
     log_after_modify: Joi.object(),
     method: Joi.string(),
     adds: Joi.object({
-        header: Joi.object().required(),
-        body: Joi.object().required(),
-        query: Joi.object().required(),
-        param: Joi.object().required(),
+        header: Joi.object(),
+        body: Joi.object(),
+        query: Joi.object(),
+        param: Joi.object(),
 
     }),
     modifies: Joi.object({
-        header: Joi.object().required(),
-        body: Joi.object().required(),
-        query: Joi.object().required(),
-        param: Joi.object().required()
+        header: Joi.object(),
+        body: Joi.object(),
+        query: Joi.object(),
+        param: Joi.object(),
 
     }),
     deletes: Joi.object({
