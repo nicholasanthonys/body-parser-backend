@@ -2,10 +2,11 @@ import { IStoreContainerDTO } from "../DTO/StoreContainerDTO";
 import { IUpdateContainerDTO } from "../DTO/UpdateContainerDTO";
 import { Container as ContainerModel, IContainer, IContainerCustom } from 'src/modules/Container/Container';
 import { IProject, Project } from "src/modules/Project/Project";
-
 import Docker, { Container } from 'dockerode';
 import { RouterModel } from "src/modules/RouterModel";
-
+import shell from "shelljs"
+import jsonfile from 'jsonfile'
+let docker: Docker = new Docker({ socketPath: "/var/run/docker.sock" });
 export default class ContainerController {
 
     docker: Docker = new Docker({ socketPath: "/var/run/docker.sock" });
@@ -29,6 +30,17 @@ export default class ContainerController {
 
     }
 
+    async find(dbContainerId: string, userId: string): Promise<IContainer | null> {
+        let dbContainer = await ContainerModel.findOne({
+            _id: dbContainerId,
+            user_id: userId,
+        });
+        if (dbContainer) {
+            return dbContainer
+        }
+        return null;
+    }
+
     async show(dbContainerId: string, userId: string): Promise<IContainerCustom | null> {
 
         const container = await ContainerModel.findOne({
@@ -44,8 +56,6 @@ export default class ContainerController {
         let running = false;
 
         const dockerContainerInspect = await this.getDockerContainerInspectInfo(container.id)
-        console.log("dockercontainer inspect is")
-        console.log(dockerContainerInspect)
 
         if (dockerContainerInspect) {
             running = dockerContainerInspect.State.Running
@@ -172,4 +182,231 @@ export default class ContainerController {
         }
     }
 
+    async writeContainerProjects(dbContainerId: string, userId: string): Promise<NodeJS.ErrnoException | null> {
+        let dbContainer = await ContainerModel.find({
+            _id: dbContainerId,
+            user_id: userId
+        }).select('+routers.project_directory') as IContainer;
+        if (!dbContainer) {
+
+            return new Error('Container not found')
+        }
+
+        //* To store error
+        let operationError: NodeJS.ErrnoException | null = null
+
+        //* write projects and configures
+        const projects = await Project.find({
+            '_id': { $in: dbContainer.project_ids }
+        }) as Array<IProject>
+
+        //* Create directory for containers
+        let dir = `tmp/containers/${dbContainerId}/configures`
+        console.log("dir is ")
+        console.log(dir);
+
+        shell.mkdir('-p', dir)
+
+        projects.forEach(async (project) => {
+
+            //* Create container for each project
+            shell.mkdir('-p', dir + `/${project._id}`)
+            let projectDir = `${dir}/${project._id}`
+
+            //* write serial.json
+            let serialFileName = `${projectDir}/serial.json`
+            jsonfile.writeFile(serialFileName, project.serial, { spaces: 2, replacer: undefined }, function (err) {
+                if (err) {
+                    console.log("error is");
+                    console.log(err);
+                    operationError = err;
+                }
+
+            })
+
+            if (operationError) {
+                console.log("error write serial.json")
+                console.log(operationError);
+                return operationError
+            }
+
+            //* write parallel.json
+            let parallelFileName = `${projectDir}/parallel.json`
+            jsonfile.writeFile(parallelFileName, project.parallel, { spaces: 2, replacer: undefined }, function (err) {
+                if (err) {
+                    console.log("error is");
+                    console.log(err);
+                    operationError = err;
+                }
+            })
+
+
+            if (operationError) {
+                console.log("error write parallel.json")
+                console.log(operationError);
+                return operationError
+            }
+
+            // * Write configure-n.json for each configures
+            project.configures.configs.forEach((config) => {
+
+                //* set configure file name with id 
+                let fileName = config._id;
+
+                let file = `${projectDir}/${fileName}.json`
+
+                jsonfile.writeFile(file, config, { spaces: 2, replacer: undefined }, function (err) {
+                    if (err) {
+                        console.log("error is");
+                        console.log(err);
+                        operationError = err;
+                    }
+                })
+            })
+
+        })
+
+        if (operationError) {
+            console.log("error write each config project")
+            console.log(operationError);
+            return operationError;
+        }
+
+        //* write router
+        let file = `${dir}/router.json`
+        jsonfile.writeFile(file, dbContainer.routers, { spaces: 1 }, function (err) {
+            if (err) {
+                console.log("error is");
+                console.log(err);
+                operationError = err;
+            }
+
+        })
+
+
+        if (operationError) {
+            console.log("error write router")
+            return operationError;
+        }
+        return null;
+
+    }
+
+
+    async createContainer(dbContainer: IContainer): Promise<Docker.Container> {
+
+        let port = 80
+
+        //* port is where the image application running and exposed its port
+        let ExposedPorts: { [port: string]: {} } = {}
+        ExposedPorts[String(port) + "/tcp"] = {}
+
+        //* Port binding is the host port
+        let PortBindings: any = {}
+        PortBindings[String(port) + "/tcp"] = [
+            {
+                HostIp: "0.0.0.0",
+                HostPort: String(port),
+            },
+        ]
+
+        //* Delete container if already created
+        if (dbContainer.container_id) {
+            // * Delete Container
+            try {
+                const container = docker.getContainer(dbContainer.container_id);
+                if (container) {
+                    let inspect = await container.inspect();
+                    if (inspect.State.Running) {
+                        await container.stop();
+                    };
+                    await container.remove();
+                }
+            } catch (error) {
+                throw Error(error)
+            }
+        }
+
+        let Binds = ['/home/nicholas/Desktop/clone/express-body-parser-backend/tmp/containers/' + dbContainer._id + '/configures:/app/configures:rw']
+      
+        return await docker.createContainer(
+            {
+                Image: "go-single-middleware:1.0",
+                Cmd: ["./build/go-single-middleware"],
+                name: dbContainer._id.toString(),
+                ExposedPorts,
+                Volumes: {
+                    "/volumes/data": {},
+                },
+                HostConfig: {
+                    // PortBindings,
+                    Binds
+                },
+                NetworkingConfig: {
+                    EndpointsConfig: {
+                        "proxy_middleware_net": {}
+                    }
+                }
+            },
+        ).then(async (container) => {
+            dbContainer.container_id = container.id;
+            await dbContainer.save();
+            return container;
+
+        }).catch( (error) => {
+            console.log("error when creating container");
+            console.log(error);
+            throw Error(error);
+        })
+
+    }
+
+    async startDockerContainer(dockerContainer: Docker.Container): Promise< Boolean> {
+
+        await dockerContainer.start();
+        return true;
+    }
+
+    async toggleStartStopContainer(dbContainerId : string, userId : string) : Promise <IContainerCustom>{
+        let dbContainer = await ContainerModel.findOne({ _id: dbContainerId, user_id: userId }) as IContainer
+        if (!dbContainer) {
+            throw new Error('db Container not found')
+        }
+        if(!dbContainer.container_id){
+            throw new Error('docker not container not created')
+        }
+
+        let dockerContainer = docker.getContainer(dbContainer.container_id);
+        let inspect = await dockerContainer.inspect()
+        let running = false;
+        if (inspect.State.Running) {
+            //* Stop
+            await dockerContainer.stop();
+            running =false;
+        } else {
+            //* start
+            await dockerContainer.start();
+            running  = true;
+        }
+
+        let containerWithStatus: IContainerCustom = {
+            _id: dbContainer._id,
+            user_id: dbContainer.user_id,
+            container_id: dbContainer.container_id,
+            name: dbContainer.name,
+            description: dbContainer.description,
+            project_ids: dbContainer.project_ids,
+            routers: dbContainer.routers,
+            date: dbContainer.date,
+            running ,
+        }
+        return containerWithStatus;
+
+    }
+
+    async findDockerContainer(dbContainerId: string): Promise<Docker.Container> {
+
+        const dockerContainer = docker.getContainer(dbContainerId);
+        return dockerContainer
+    }
 }
