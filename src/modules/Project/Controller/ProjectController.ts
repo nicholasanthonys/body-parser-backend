@@ -23,7 +23,7 @@ export default class ProjectController {
         //* Get project without its configures, and sort by date (newest or descending)
         return await Project.find({ userId })
             .sort({ date: "desc" })
-            .select("-configures");
+            .select(["-configures", '-serial', '-parallel' ]);
     }
 
     async show(projectId: string, userId : string): Promise<IProject> {
