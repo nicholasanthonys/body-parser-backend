@@ -1,5 +1,5 @@
 
-import { Schema, Document, model, plugin } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 import { IFinalResponseConfig } from '../Response';
 import { finalResponseConfigSchema} from '../Response'
 
@@ -26,7 +26,7 @@ export const cLogicSchema = new Schema({
     next_success: {
         type: String,
         required: false,
-        default: null
+        default: '' ,
     },
     response: {
         type: finalResponseConfigSchema,
