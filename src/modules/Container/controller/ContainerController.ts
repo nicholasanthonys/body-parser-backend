@@ -183,7 +183,7 @@ export default class ContainerController {
     }
 
     async writeContainerProjects(dbContainerId: string, userId: string): Promise<NodeJS.ErrnoException | null> {
-        let dbContainer = await ContainerModel.find({
+        let dbContainer = await ContainerModel.findOne({
             _id: dbContainerId,
             user_id: userId
         }).select('+routers.project_directory') as IContainer;
@@ -206,6 +206,11 @@ export default class ContainerController {
         console.log(dir);
 
         shell.mkdir('-p', dir)
+        
+        console.log("db container project is is ")
+        console.log(dbContainer.project_ids);
+        console.log("projects length : ")
+        console.log(projects.length);
 
         projects.forEach(async (project) => {
 
@@ -214,12 +219,15 @@ export default class ContainerController {
             let projectDir = `${dir}/${project._id}`
 
             //* write serial.json
+            console.log("serial json is ")
+            console.log(project.serial.toJSON())
             let serialFileName = `${projectDir}/serial.json`
-            jsonfile.writeFile(serialFileName, project.serial, { spaces: 2, replacer: undefined }, function (err) {
+            jsonfile.writeFile(serialFileName, project.serial.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
                 if (err) {
-                    console.log("error is");
+                    console.log("error write serial.json is");
                     console.log(err);
                     operationError = err;
+                    throw Error(err.message)
                 }
 
             })
@@ -227,16 +235,17 @@ export default class ContainerController {
             if (operationError) {
                 console.log("error write serial.json")
                 console.log(operationError);
-                return operationError
+                throw Error(operationError.message)
             }
 
             //* write parallel.json
             let parallelFileName = `${projectDir}/parallel.json`
-            jsonfile.writeFile(parallelFileName, project.parallel, { spaces: 2, replacer: undefined }, function (err) {
+            jsonfile.writeFile(parallelFileName, project.parallel.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
                 if (err) {
-                    console.log("error is");
+                    console.log("error write parallel.json ");
                     console.log(err);
-                    operationError = err;
+                    operationError = err
+                    throw Error(err.message)
                 }
             })
 
@@ -244,7 +253,7 @@ export default class ContainerController {
             if (operationError) {
                 console.log("error write parallel.json")
                 console.log(operationError);
-                return operationError
+                throw Error(operationError)
             }
 
             // * Write configure-n.json for each configures
@@ -255,11 +264,12 @@ export default class ContainerController {
 
                 let file = `${projectDir}/${fileName}.json`
 
-                jsonfile.writeFile(file, config, { spaces: 2, replacer: undefined }, function (err) {
+                jsonfile.writeFile(file, config.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
                     if (err) {
-                        console.log("error is");
+                        console.log("error  write file configure ");
                         console.log(err);
                         operationError = err;
+                        throw Error(err.message)
                     }
                 })
             })
@@ -269,14 +279,14 @@ export default class ContainerController {
         if (operationError) {
             console.log("error write each config project")
             console.log(operationError);
-            return operationError;
+            throw Error(operationError);
         }
 
-        //* write router
+        // //* write router
         let file = `${dir}/router.json`
         jsonfile.writeFile(file, dbContainer.routers, { spaces: 1 }, function (err) {
             if (err) {
-                console.log("error is");
+                console.log("error write router is");
                 console.log(err);
                 operationError = err;
             }
