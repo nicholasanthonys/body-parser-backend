@@ -1,7 +1,7 @@
 import { Schema, Document, model } from 'mongoose';
-import {  cLogicSchema, ICLogic } from './CLogic';
+import { cLogicSchema, ICLogic } from './CLogic';
 import { configureFileSerialSchema, IConfigureFileSerial } from './ConfigureFileSerial';
-import { IFinalResponseConfig, finalResponseConfigSchema} from '../Response';
+import { IFinalResponseConfig, finalResponseConfigSchema } from '../Response';
 
 
 export interface ISerial extends Document {
@@ -14,6 +14,7 @@ export const serialSchema = new Schema({
     configures: {
         type: [configureFileSerialSchema],
         required: true,
+        default: [],
 
     },
     date: {

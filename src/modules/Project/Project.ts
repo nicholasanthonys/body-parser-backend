@@ -1,9 +1,9 @@
-import { Schema, Document, model  } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 import { IUser } from '../User';
-import {configureSchema,IConfigure} from '../Configure/Configure';
+import { configureSchema, IConfigure } from '../Configure/Configure';
 import { ISerial, serialSchema } from '../SerialParallel/Serial';
 import { parallelSchema, IParallel } from '../SerialParallel/Parallel';
-import {baseSchema, IBase} from '../SerialParallel/Base'
+import { baseSchema, IBase } from '../SerialParallel/Base'
 
 
 
@@ -13,10 +13,10 @@ export interface IProject extends Document {
     name: string;
     description: string;
     date: Date,
-    configures : IConfigure,
-    serial : ISerial | null ,
-    parallel : IParallel | null,
-    base : IBase
+    configures: IConfigure,
+    serial: ISerial | null,
+    parallel: IParallel | null,
+    base: IBase
 }
 
 const projectSchema = new Schema({
@@ -36,32 +36,61 @@ const projectSchema = new Schema({
         type: String,
         required: false
     },
-    configures :{
-        type : configureSchema,
-        default : {
-            description : ''
+    configures: {
+        type: configureSchema,
+        default: {
+            description: ''
         },
-        required : false,
+        required: false,
     },
-    serial : {
-        type : serialSchema,
-        default : null,
-        required : false
+    serial: {
+        type: serialSchema,
+        required: true,
+        default: {
+            configures: [],
+
+        },
     },
-    parallel : {
-        type : parallelSchema,
-        default : null,
-        required : false
+    parallel: {
+        type: parallelSchema,
+        required: true,
+        default: {
+            c_logics: [],
+            configures: [],
+            next_failure: {
+                status_code: '200',
+                transform:
+                    "ToJson",
+
+                log_before_modify: {},
+                log_after_modify: {},
+                adds: {
+                    header: {},
+                    body: {},
+                },
+                modifies: {
+                    header: {},
+                    body: {}
+                },
+                deletes: {
+                    header: [],
+                    body: [],
+                }
+
+            }
+        }
+
+
     },
-    base : {
-        type : baseSchema,
-        required : true
+    base: {
+        type: baseSchema,
+        required: true
     },
     date: {
         type: Date,
         default: Date.now,
     },
-}  );
+});
 
 projectSchema.set('toJSON', {
     virtuals: true,

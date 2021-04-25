@@ -63,6 +63,7 @@ export const finalResponseConfigSchema = new Schema({
     status_code: {
         type: String,
         required: true,
+        default : '',
     },
     transform: {
         type: String,

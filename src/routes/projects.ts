@@ -4,11 +4,14 @@ import { storeProjectValidation, updateProjectValidation } from "src/modules/Pro
 import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
-import { IStoreParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
-import {IStoreSerialDTO} from "src/modules/SerialParallel/DTO/StoreSerialDTO"
+import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
+import { IStoreSerialDTO } from "src/modules/SerialParallel/DTO/StoreSerialDTO"
 import ParallelController from "src/modules/SerialParallel/Controller/ParallelController";
-import { storeOrUpdateParallelValidation, storeOrUpdateSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
+import { responseSchema, storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleConfigParallelValidation, updateSingleCLogicParallelValidation, updateSingleConfigParallelValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
 import SerialController from "src/modules/SerialParallel/Controller/SerialController";
+import { IUpdateSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/UpdateSerialDTO";
+import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from "src/modules/SerialParallel/DTO/CLogicDTO";
+import { IResponseDTO } from "src/modules/SerialParallel/DTO/StoreResponseDTO";
 const router = Router();
 
 const projectControler = new ProjectController();
@@ -43,9 +46,9 @@ router.get("/:project_id/serial", async (req: Request, res: Response) => {
     }
 
     const serial = await serialController.getSerial(project_id, user.id);
-    if(!serial){
+    if (!serial) {
         return res.status(400).send({
-            message : "Project not found"
+            message: "Project not found"
         })
     }
     return res.status(200).send(serial)
@@ -67,9 +70,9 @@ router.post("/:project_id/serial", async (req: Request, res: Response) => {
 
     try {
         const serial = await serialController.storeSerial(storeSerialDTO, project_id, user.id)
-        if(!serial){
+        if (!serial) {
             return res.status(400).send({
-                message : "No Project found"
+                message: "No Project found"
             })
         }
 
@@ -95,9 +98,9 @@ router.put("/:project_id/serial", async (req: Request, res: Response) => {
 
     try {
         const serial = await serialController.updateSerial(storeSerialOrParallelDTO, project_id, user.id)
-        if(!serial){
+        if (!serial) {
             return res.status(400).send({
-                message : "No Project found"
+                message: "No Project found"
             })
         }
         return res.status(200).send(serial);
@@ -114,16 +117,16 @@ router.get("/:project_id/parallel", async (req: Request, res: Response) => {
     }
 
     const parallel = await parallelController.getParallel(project_id, user.id);
-    if(!parallel){
+    if (!parallel) {
         return res.status(400).send({
-            message : "Project not found"
+            message: "Project not found"
         })
     }
     return res.status(200).send(parallel)
 });
 
 router.post("/:project_id/parallel", async (req: Request, res: Response) => {
-    const storeSerialOrParallelDTO = req.body as IStoreParallelDTO;
+    const storeParallelDTO = req.body as IStoreParallelDTO;
     const { project_id } = req.params;
     const user = decodeToken(req);
     if (!user) {
@@ -137,13 +140,94 @@ router.post("/:project_id/parallel", async (req: Request, res: Response) => {
     }
 
     try {
-        const parallel = await parallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
-        if(!parallel){
+        const parallel = await parallelController.storeParallel(storeParallelDTO, project_id, user.id)
+        if (!parallel) {
             return res.status(400).send({
-                message : "No Project found"
+                message: "No Project found"
             })
         }
         return res.status(200).send(parallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/parallel/next-failure", async (req: Request, res: Response) => {
+    const storeNextFailureDTO = req.body as IResponseDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeResponseValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const nextFailure = await parallelController.storeNextFailure(storeNextFailureDTO, project_id, user.id)
+        if (!nextFailure) {
+            return res.status(400).send({
+                message: "Item not found"
+            })
+        }
+        return res.status(200).send(nextFailure);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/parallel/config/new", async (req: Request, res: Response) => {
+    const storeSingleConfigParallelDTO = req.body as IStoreSingleConfigParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeSingleConfigParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const configParallel = await parallelController.storeSingleConfigParallel(storeSingleConfigParallelDTO, project_id, user.id)
+        if (!configParallel) {
+            return res.status(400).send({
+                message: "No Project found"
+            })
+        }
+        return res.status(200).send(configParallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+router.post("/:project_id/parallel/clogic/new", async (req: Request, res: Response) => {
+    const storeSingleCLogicParallelDTO = req.body as IStoreSingleCLogicItemDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = storeSingleCLogicParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const cLogicParallel = await parallelController.storeSingleCLogicParallel(storeSingleCLogicParallelDTO, project_id, user.id)
+        if (!cLogicParallel) {
+            return res.status(400).send({
+                message: "Item not found"
+            })
+        }
+        return res.status(200).send(cLogicParallel);
     } catch (err) {
         return res.status(400).send(err.message);
     }
@@ -165,9 +249,9 @@ router.put("/:project_id/parallel", async (req: Request, res: Response) => {
 
     try {
         const parallel = await parallelController.storeParallel(storeSerialOrParallelDTO, project_id, user.id)
-        if(!parallel){
+        if (!parallel) {
             return res.status(400).send({
-                message : "No Project found"
+                message: "No Project found"
             })
         }
         return res.status(200).send(parallel);
@@ -203,6 +287,61 @@ router.get("/:id", async (req: Request, res: Response) => {
         } catch (error) {
             return res.status(400).send({ message: error.message });
         }
+    }
+});
+
+router.put("/:project_id/parallel/config", async (req: Request, res: Response) => {
+    const updateSingleConfigParallelDTO = req.body as IUpdateSingleConfigParallelDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = updateSingleConfigParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const configParallel = await parallelController.updateSingleConfigParallel(updateSingleConfigParallelDTO, project_id, user.id)
+        if (!configParallel) {
+            return res.status(400).send({
+                message: "Item not found"
+            })
+        }
+        return res.status(200).send(configParallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+});
+
+
+router.put("/:project_id/parallel/clogic", async (req: Request, res: Response) => {
+    const updateSingleCLogicParallelDTO = req.body as IUpdateSingleCLogicItemDTO;
+    const { project_id } = req.params;
+    const user = decodeToken(req);
+    if (!user) {
+        return res.sendStatus(403);
+    }
+    const { error } = updateSingleCLogicParallelValidation(req.body);
+    if (error) {
+        return res.status(400).send({
+            message: error.message
+        })
+    }
+
+    try {
+        const cLogicParallel = await parallelController.updateSingleCLogicParallel(updateSingleCLogicParallelDTO, project_id, user.id)
+        if (!cLogicParallel) {
+            return res.status(400).send({
+                message: "Item not found"
+            })
+        }
+        return res.status(200).send(cLogicParallel);
+    } catch (err) {
+        return res.status(400).send(err.message);
     }
 });
 

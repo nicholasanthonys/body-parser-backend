@@ -35,6 +35,44 @@ export const storeOrUpdateSerialValidation = (data: Request): ValidationResult =
     return schema.validate(data)
 }
 
+export const storeSingleConfigParallelValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        configure_id: Joi.string().required(),
+        alias: Joi.string().required(),
+    })
+    return schema.validate(data)
+}
+
+export const updateSingleConfigParallelValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        configure_id: Joi.string().required(),
+        alias: Joi.string().required(),
+    })
+    return schema.validate(data)
+}
+
+export const storeSingleCLogicParallelValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        rule: Joi.object().allow(null),
+        data: Joi.object().allow(null),
+        next_success: Joi.string().allow(null),
+        response: responseSchema.allow(null)
+    })
+    return schema.validate(data)
+}
+
+export const updateSingleCLogicParallelValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        id: Joi.string().required(),
+        rule: Joi.object().allow(null),
+        data: Joi.object().allow(null),
+        next_success: Joi.string().allow(null),
+        response: responseSchema.allow(null)
+    })
+    return schema.validate(data)
+}
+
 export const responseSchema = Joi.object({
     status_code: Joi.number().required(),
     transform: Joi.string().required(),
@@ -52,3 +90,24 @@ export const responseSchema = Joi.object({
     }).required()
 
 })
+
+export const storeResponseValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        status_code: Joi.number().required(),
+        transform: Joi.string().required(),
+        adds: Joi.object({
+            header: Joi.object(),
+            body: Joi.object(),
+        }).required(),
+        modifies: Joi.object({
+            header: Joi.object(),
+            body: Joi.object(),
+        }).required(),
+        deletes: Joi.object({
+            header: Joi.array().items(Joi.string()),
+            body: Joi.array().items(Joi.string()),
+        }).required()
+    })
+
+    return schema.validate(data)
+}

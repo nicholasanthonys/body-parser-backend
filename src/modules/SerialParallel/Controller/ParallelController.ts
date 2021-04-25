@@ -2,11 +2,15 @@
 import ProjectController from 'src/modules/Project/Controller/ProjectController'
 import { IProject, Project } from 'src/modules/Project/Project';
 import { ConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSerial'
-import { CLogic } from 'src/modules/SerialParallel/CLogic'
-import { IStoreParallelDTO} from '../DTO/StoreParallelDTO'
-import {IStoreSerialDTO } from '../DTO/StoreSerialDTO'
+import { CLogic, ICLogic } from 'src/modules/SerialParallel/CLogic'
+import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from '../DTO/StoreParallelDTO'
 import { IParallel, Parallel } from '../Parallel';
-import { ISerial, Serial } from '../Serial';
+import { ConfigureFileParallel, IConfigureFileParallel } from '../ConfigureFileParallel';
+
+import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateSerialDTO';
+import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO'
+import { FinalResponse, IFinalResponseConfig } from 'src/modules/Response';
+import { IResponseDTO } from '../DTO/StoreResponseDTO';
 export default class ParallelController {
 
     projectController: ProjectController = new ProjectController()
@@ -25,8 +29,108 @@ export default class ParallelController {
         return project.parallel
     }
 
+    async storeNextFailure(storeNextFailure: IResponseDTO, projectId: string, userId: string): Promise<IFinalResponseConfig | null> {
+        let project = await this.projectController.show(projectId, userId);
+        if (!project) {
+            return null;
+        }
+        if (project.parallel) {
+            project.parallel.next_failure = new FinalResponse({
+                status_code: storeNextFailure.status_code,
+                transform: storeNextFailure.transform,
+                adds: storeNextFailure.adds,
+                modifies: storeNextFailure.modifies,
+                deletes: storeNextFailure.deletes,
+            })
 
-    async getParallel(projectId: string, userId: string ): Promise<IParallel | null> {
+
+            await project.save();
+            return project.parallel?.next_failure
+        }
+        return null;
+    }
+
+    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFileParallel | null | undefined> {
+        let project = await this.projectController.show(projectId, userId);
+        if (!project) {
+            return null;
+        }
+        project.parallel?.configures.push(new ConfigureFileParallel({
+            configure_id: storeSingleConfigParallelDTO.configure_id,
+            alias: storeSingleConfigParallelDTO.alias
+        }));
+
+        await project.save();
+        return project.parallel?.configures[project.parallel.configures.length - 1]
+    }
+
+    async storeSingleCLogicParallel(storeSingleCLogicParallelDTO: IStoreSingleCLogicItemDTO, projectId: string, userId: string): Promise<ICLogic | null | undefined> {
+        let project = await this.projectController.show(projectId, userId);
+        if (!project) {
+            return null;
+        }
+        project.parallel?.c_logics.push(new CLogic({
+            rule: storeSingleCLogicParallelDTO.rule,
+            data: storeSingleCLogicParallelDTO.data,
+            next_success: storeSingleCLogicParallelDTO.next_success,
+            response: storeSingleCLogicParallelDTO.response
+        }));
+
+        await project.save();
+        return project.parallel?.c_logics[project.parallel.c_logics.length - 1]
+    }
+
+    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFileParallel | null | undefined> {
+        let project = await this.projectController.show(projectId, userId);
+
+        if (!project) {
+            return null;
+        }
+
+        let index = project.parallel?.configures.findIndex(e => e._id == storeSingleConfigParallelDTO.id);
+        if (index != undefined && index >= 0) {
+            if (project.parallel) {
+                project.parallel.configures[index].configure_id = storeSingleConfigParallelDTO.configure_id
+                project.parallel.configures[index].alias = storeSingleConfigParallelDTO.alias
+                await project.save();
+                return project.parallel.configures[index]
+            }
+            return null;
+        }
+        return null;
+    }
+
+
+
+    async updateSingleCLogicParallel(updateSingleCLogicParallelDTO: IUpdateSingleCLogicItemDTO, projectId: string, userId: string): Promise<ICLogic | null | undefined> {
+        let project = await this.projectController.show(projectId, userId);
+
+        if (!project) {
+            return null;
+        }
+
+        let index = project.parallel?.c_logics.findIndex(e => e._id == updateSingleCLogicParallelDTO.id);
+        if (index != undefined && index >= 0) {
+            if (project.parallel) {
+                project.parallel.c_logics[index].rule = updateSingleCLogicParallelDTO.rule,
+                    project.parallel.c_logics[index].data = updateSingleCLogicParallelDTO.data,
+                    project.parallel.c_logics[index].next_success = updateSingleCLogicParallelDTO.next_success,
+                    project.parallel.c_logics[index].response = new FinalResponse({
+                        status_code: updateSingleCLogicParallelDTO.response.status_code,
+                        transform: updateSingleCLogicParallelDTO.response.transform,
+                        adds: updateSingleCLogicParallelDTO.response.adds,
+                        modifies: updateSingleCLogicParallelDTO.response.modifies,
+                        deletes: updateSingleCLogicParallelDTO.response.deletes,
+                    })
+                await project.save();
+                return project.parallel.c_logics[index]
+            }
+            return null;
+        }
+        return null;
+    }
+
+    async getParallel(projectId: string, userId: string): Promise<IParallel | null> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null
@@ -44,7 +148,7 @@ export default class ParallelController {
             project.parallel.configures = [];
             storeParallelDTO.configures.forEach(element => {
                 let configureFile = new ConfigureFileSerial({
-                    configure_id : element.configure_id,
+                    configure_id: element.configure_id,
                     alias: element.alias
                 })
                 project.parallel?.configures.push(configureFile)

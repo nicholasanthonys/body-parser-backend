@@ -14,10 +14,12 @@ export const configureFileSerialSchema = new Schema({
     configure_id: {
         type: Schema.Types.String,
         required: true,
+        default : ''
     },
     alias: {
         type: Schema.Types.String,
         required: true,
+        default : '',
     },
     c_logics : {
         type : [cLogicSchema],
