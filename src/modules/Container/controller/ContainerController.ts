@@ -201,7 +201,7 @@ export default class ContainerController {
         }) as Array<IProject>
 
         //* Create directory for containers
-        let dir = `tmp/containers/${dbContainerId}/configures`
+        let dir = `${process.env.TMP_PATH}/containers/${dbContainerId}/configures`
         console.log("dir is ")
         console.log(dir);
 
@@ -372,7 +372,7 @@ export default class ContainerController {
             },
         ).then(async (container) => {
 
-            let pathToConfigures = `${process.env.TMP_PATH}/` + dbContainer._id + '/configures/.'
+            let pathToConfigures = `${process.env.TMP_PATH}/containers/` + dbContainer._id + '/configures/.'
             shell.exec(`docker cp ${pathToConfigures} ${container.id}:${dockerContainerVolumeMountpoint}`)
             dbContainer.container_id = container.id;
             await dbContainer.save();
