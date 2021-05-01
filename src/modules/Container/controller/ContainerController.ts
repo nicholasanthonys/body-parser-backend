@@ -206,7 +206,7 @@ export default class ContainerController {
         console.log(dir);
 
         shell.mkdir('-p', dir)
-        
+
         console.log("db container project is is ")
         console.log(dbContainer.project_ids);
         console.log("projects length : ")
@@ -225,6 +225,18 @@ export default class ContainerController {
             jsonfile.writeFile(serialFileName, project.serial.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
                 if (err) {
                     console.log("error write serial.json is");
+                    console.log(err);
+                    operationError = err;
+                    throw Error(err.message)
+                }
+
+            })
+
+            //* Write base.json
+            let baseFileName = `${projectDir}/base.json`
+            jsonfile.writeFile(baseFileName, project.base.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
+                if (err) {
+                    console.log("error write base.json is");
                     console.log(err);
                     operationError = err;
                     throw Error(err.message)
@@ -337,33 +349,37 @@ export default class ContainerController {
             }
         }
 
-        let Binds = ['/home/nicholas/Desktop/clone/express-body-parser-backend/tmp/containers/' + dbContainer._id + '/configures:/app/configures:rw']
-      
+        //* Set docker network
+        let dockerNetwork = process.env.DOCKER_NETWORK_NAME || "proxy_middleware_net"
+        let EndpointsConfig: { [dockerNetwork: string]: {} } = {}
+        EndpointsConfig[dockerNetwork] = {}
+
+        //* Set docker volume
+        let dockerContainerVolumeMountpoint = process.env.DOCKER_CONTAINER_VOLUME_MOUNTPOINT || "/app/src/configures"
+        let Volumes: { [dockerContainerVolumeMountpoint: string]: {} } = {}
+        Volumes[dockerContainerVolumeMountpoint] = {}
+
         return await docker.createContainer(
             {
                 Image: "go-single-middleware:1.0",
                 Cmd: ["./build/go-single-middleware"],
                 name: dbContainer._id.toString(),
                 ExposedPorts,
-                Volumes: {
-                    "/volumes/data": {},
-                },
-                HostConfig: {
-                    // PortBindings,
-                    Binds
-                },
+                Volumes,
                 NetworkingConfig: {
-                    EndpointsConfig: {
-                        "proxy_middleware_net": {}
-                    }
+                    EndpointsConfig
                 }
             },
         ).then(async (container) => {
+
+            let pathToConfigures = `${process.env.TMP_PATH}/` + dbContainer._id + '/configures/.'
+            shell.exec(`docker cp ${pathToConfigures} ${container.id}:${dockerContainerVolumeMountpoint}`)
             dbContainer.container_id = container.id;
             await dbContainer.save();
             return container;
 
-        }).catch( (error) => {
+
+        }).catch((error) => {
             console.log("error when creating container");
             console.log(error);
             throw Error(error);
@@ -371,18 +387,18 @@ export default class ContainerController {
 
     }
 
-    async startDockerContainer(dockerContainer: Docker.Container): Promise< Boolean> {
+    async startDockerContainer(dockerContainer: Docker.Container): Promise<Boolean> {
 
         await dockerContainer.start();
         return true;
     }
 
-    async toggleStartStopContainer(dbContainerId : string, userId : string) : Promise <IContainerCustom>{
+    async toggleStartStopContainer(dbContainerId: string, userId: string): Promise<IContainerCustom> {
         let dbContainer = await ContainerModel.findOne({ _id: dbContainerId, user_id: userId }) as IContainer
         if (!dbContainer) {
             throw new Error('db Container not found')
         }
-        if(!dbContainer.container_id){
+        if (!dbContainer.container_id) {
             throw new Error('docker not container not created')
         }
 
@@ -392,11 +408,11 @@ export default class ContainerController {
         if (inspect.State.Running) {
             //* Stop
             await dockerContainer.stop();
-            running =false;
+            running = false;
         } else {
             //* start
             await dockerContainer.start();
-            running  = true;
+            running = true;
         }
 
         let containerWithStatus: IContainerCustom = {
@@ -408,7 +424,7 @@ export default class ContainerController {
             project_ids: dbContainer.project_ids,
             routers: dbContainer.routers,
             date: dbContainer.date,
-            running ,
+            running,
         }
         return containerWithStatus;
 
