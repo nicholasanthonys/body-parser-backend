@@ -234,3 +234,9 @@ build
 *.rest
 
 tmp/
+.idea/.gitignore
+.idea/express-body-parser-backend.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
