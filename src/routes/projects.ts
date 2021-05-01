@@ -5,9 +5,9 @@ import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
-import { IStoreSerialDTO , ISerialConfigDTO, IUpdateSingleConfigureFileSerialDTO, IStoreSingleSerialConfigDTO} from "src/modules/SerialParallel/DTO/StoreSerialDTO"
+import { IStoreSerialDTO,  IUpdateSingleConfigureFileSerialDTO, IStoreSingleSerialConfigDTO } from "src/modules/SerialParallel/DTO/StoreSerialDTO"
 import ParallelController from "src/modules/SerialParallel/Controller/ParallelController";
-import { responseSchema, storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleCLogicSerialValidation, storeSingleConfigParallelValidation, storeSingleConfigSerialValidation, updateSingleCLogicParallelValidation, updateSingleCLogicSerialValidation, updateSingleConfigParallelValidation, updateSingleConfigSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
+import {  storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleCLogicSerialValidation, storeSingleConfigParallelValidation, storeSingleConfigSerialValidation, updateSingleCLogicParallelValidation, updateSingleCLogicSerialValidation, updateSingleConfigParallelValidation, updateSingleConfigSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
 import SerialController from "src/modules/SerialParallel/Controller/SerialController";
 import { IUpdateSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/UpdateParallelDTO";
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from "src/modules/SerialParallel/DTO/CLogicDTO";
@@ -377,11 +377,12 @@ router.put("/:project_id/parallel", async (req: Request, res: Response) => {
 //* Get all projects
 router.get("/", async (req: Request, res: Response) => {
     const user = decodeToken(req);
-    if (user) {
-        //* Get project without its configures, and sort by date (newest or descending)
-        const projects = await projectControler.getAll(user.id)
-        return res.status(200).send(projects);
+    if (!user) {
+        return res.sendStatus(401);
     }
+    //* Get project without its configures, and sort by date (newest or descending)
+    const projects = await projectControler.getAll(user.id)
+    return res.status(200).send(projects);
 });
 
 //* Get project detail and its configures
