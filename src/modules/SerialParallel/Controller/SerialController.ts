@@ -6,7 +6,7 @@ import { FinalResponse } from 'src/modules/Response';
 import { ConfigureFileSerial, IConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSerial'
 import { CLogic, ICLogic } from '../CLogic';
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO';
-import { ISerialConfigDTO, IStoreSerialDTO,  IStoreSingleSerialConfigDTO, IUpdateSingleConfigureFileSerialDTO } from '../DTO/StoreSerialDTO'
+import { ISerialConfigDTO, IStoreSerialDTO, IStoreSingleSerialConfigDTO, IUpdateSingleConfigureFileSerialDTO } from '../DTO/StoreSerialDTO'
 import { ISerial, Serial } from '../Serial';
 export default class SerialController {
 
@@ -29,7 +29,7 @@ export default class SerialController {
 
     }
 
-    async storeSingleCLogic(storeCLogicDTO: IStoreSingleCLogicItemDTO, projectId: string, userId: string,configId : string ) : Promise<ICLogic | null | undefined> {
+    async storeSingleCLogic(storeCLogicDTO: IStoreSingleCLogicItemDTO, projectId: string, userId: string, configId: string): Promise<ICLogic | null | undefined> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             console.log("project is null");
@@ -41,12 +41,12 @@ export default class SerialController {
         if (confIndex >= 0) {
             project.serial.configures[confIndex].c_logics.push(new CLogic({
                 rule: storeCLogicDTO.rule,
-                data:storeCLogicDTO.data,
+                data: storeCLogicDTO.data,
                 next_success: storeCLogicDTO.next_success,
-                response:storeCLogicDTO.response 
+                response: storeCLogicDTO.response
             }))
             await project.save();
-            return project.serial.configures[confIndex].c_logics[ project.serial.configures[confIndex].c_logics.length -1 ];
+            return project.serial.configures[confIndex].c_logics[project.serial.configures[confIndex].c_logics.length - 1];
         }
 
     }
@@ -65,24 +65,29 @@ export default class SerialController {
                 project.serial.configures[confIndex].c_logics[cLogicIndex].rule = storeCLogicDTO.rule
                 project.serial.configures[confIndex].c_logics[cLogicIndex].data = storeCLogicDTO.data
                 project.serial.configures[confIndex].c_logics[cLogicIndex].next_success = storeCLogicDTO.next_success
-                project.serial.configures[confIndex].c_logics[cLogicIndex].response = new FinalResponse({
-                    status_code: storeCLogicDTO.response.status_code,
-                    transform: storeCLogicDTO.response.transform,
-                    log_before_modify: {},
-                    log_after_modify: {},
-                    adds: {
-                        header: storeCLogicDTO.response.adds.header,
-                        body: storeCLogicDTO.response.adds.body,
-                    },
-                    modifies: {
-                        header: storeCLogicDTO.response.modifies.header,
-                        body: storeCLogicDTO.response.modifies.body
-                    },
-                    deletes: {
-                        header: storeCLogicDTO.response.deletes.header,
-                        body: storeCLogicDTO.response.deletes.body
-                    }
-                })
+                if (project.serial.configures[confIndex].c_logics[cLogicIndex].response) {
+                    project.serial.configures[confIndex].c_logics[cLogicIndex].response = new FinalResponse({
+                        status_code: storeCLogicDTO.response.status_code,
+                        transform: storeCLogicDTO.response.transform,
+                        log_before_modify: {},
+                        log_after_modify: {},
+                        adds: {
+                            header: storeCLogicDTO.response.adds.header,
+                            body: storeCLogicDTO.response.adds.body,
+                        },
+                        modifies: {
+                            header: storeCLogicDTO.response.modifies.header,
+                            body: storeCLogicDTO.response.modifies.body
+                        },
+                        deletes: {
+                            header: storeCLogicDTO.response.deletes.header,
+                            body: storeCLogicDTO.response.deletes.body
+                        }
+                    })
+                }else{
+                    project.serial.configures[confIndex].c_logics[cLogicIndex].response = null
+                }
+
                 await project.save();
                 return project.serial.configures[confIndex].c_logics[cLogicIndex]
             }
