@@ -61,9 +61,9 @@ export interface IFinalResponseConfig extends Document {
 
 export const finalResponseConfigSchema = new Schema({
     status_code: {
-        type: String,
+        type: Number,
         required: true,
-        default : '',
+        default : 0,
     },
     transform: {
         type: String,
