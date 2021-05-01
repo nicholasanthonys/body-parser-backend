@@ -19,13 +19,13 @@ export const cLogicSchema = new Schema({
     },
     data: {
         type: Schema.Types.Mixed,
-        required: true,
-        default: {},
+        required: false,
+        default: null,
     },
     next_success: {
         type: String,
-        required: true,
-        default: '',
+        required: false,
+        default: null,
     },
     response: {
         type: finalResponseConfigSchema,
