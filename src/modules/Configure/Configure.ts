@@ -82,7 +82,7 @@ export const requestConfigSchema = new Schema({
     },
     destination_path: {
         type: String,
-        required: true,
+        required: false,
         default: ''
     },
 
