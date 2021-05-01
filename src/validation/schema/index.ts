@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 export const configRequestSchema = Joi.object({
     destination_url: Joi.string().required(),
-    destination_path: Joi.string().allow('', null),
+    destination_path: Joi.string().allow(null, ""),
     transform: Joi.string().required(),
     log_before_modify: Joi.object(),
     log_after_modify: Joi.object(),
