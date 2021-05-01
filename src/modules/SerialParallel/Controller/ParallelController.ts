@@ -5,7 +5,7 @@ import { ConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSer
 import { CLogic, ICLogic } from 'src/modules/SerialParallel/CLogic'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from '../DTO/StoreParallelDTO'
 import { IParallel, Parallel } from '../Parallel';
-import { ConfigureFileParallel, IConfigureFileParallel } from '../ConfigureFileParallel';
+import { ConfigureFile, IConfigureFile} from '../ConfigureFile';
 
 import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateParallelDTO';
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO'
@@ -50,12 +50,12 @@ export default class ParallelController {
         return null;
     }
 
-    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFileParallel | null | undefined> {
+    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null;
         }
-        project.parallel?.configures.push(new ConfigureFileParallel({
+        project.parallel?.configures.push(new ConfigureFile({
             configure_id: storeSingleConfigParallelDTO.configure_id,
             alias: storeSingleConfigParallelDTO.alias
         }));
@@ -80,7 +80,7 @@ export default class ParallelController {
         return project.parallel?.c_logics[project.parallel.c_logics.length - 1]
     }
 
-    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFileParallel | null | undefined> {
+    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
         let project = await this.projectController.show(projectId, userId);
 
         if (!project) {

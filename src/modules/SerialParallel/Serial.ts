@@ -12,7 +12,7 @@ export interface ISerial extends Document {
 
 export const serialSchema = new Schema({
     configures: {
-        type: [configureFileSerialSchema],
+        type: [configureFileSerialSchema.schema],
         required: true,
         default: [],
 
@@ -29,4 +29,5 @@ serialSchema.set('toJSON', {
         delete ret.__v;
     },
 });
+
 export const Serial = model<ISerial>('Serial', serialSchema);

@@ -1,26 +1,15 @@
 import { Schema, Document, model } from 'mongoose';
 import { cLogicSchema,ICLogic } from './CLogic';
 import { finalResponseConfigSchema,IFinalResponseConfig} from '../Response';
+import {ConfigureFile, IConfigureFile} from "src/modules/SerialParallel/ConfigureFile";
 
 
-export interface IConfigureFileSerial extends Document {
-    configure_id: string
-    alias: string
+export interface IConfigureFileSerial extends IConfigureFile,  Document {
     c_logics : Array<ICLogic>
     next_failure : IFinalResponseConfig
 }
 
-export const configureFileSerialSchema = new Schema({
-    configure_id: {
-        type: Schema.Types.String,
-        required: true,
-        default : ''
-    },
-    alias: {
-        type: Schema.Types.String,
-        required: true,
-        default : '',
-    },
+export const configureFileSerialSchema = ConfigureFile.discriminator('ConfigureFileSerial', new Schema({
     c_logics : {
         type : [cLogicSchema],
         required : true,
@@ -34,13 +23,16 @@ export const configureFileSerialSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-});
+})  );
 
-configureFileSerialSchema.set('toJSON', {
+configureFileSerialSchema.schema.set('toJSON', {
     virtuals: true,
     transform: (doc: any, ret: any, options: any) => {
         delete ret._id;
         delete ret.__v;
     },
 });
-export const ConfigureFileSerial = model<IConfigureFileSerial>('configureFileSerial', configureFileSerialSchema);
+
+
+
+export const ConfigureFileSerial = model<IConfigureFileSerial>('ConfigureFileSerial' );
