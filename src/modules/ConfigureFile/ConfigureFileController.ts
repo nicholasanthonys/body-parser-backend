@@ -12,4 +12,14 @@ export default class ConfigureFileController{
         return false;
     }
 
+    async deleteConfigureFileSerial(projectId : string, userId : string ,configureFileId : string) : Promise<boolean> {
+        const project = await Project.findOne({_id : projectId, userId}) as IProject;
+        if(project){
+            project.serial.configures= project.serial.configures.filter(c => c._id != configureFileId)
+            await project.save()
+            return true;
+        }
+        return false;
+    }
+
 }
