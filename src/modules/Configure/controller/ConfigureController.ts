@@ -52,6 +52,7 @@ export default class ConfigureController {
             let index = project.configures.configs.findIndex((element) => element._id == configureId);
             if (index >= 0) {
                 project.configures.configs[index].description = updateProjectDTO.config.description
+                project.configures.configs[index].request.loop= updateProjectDTO.config.request.loop
 
                 project.configures.configs[index].request.destination_url = updateProjectDTO.config.request.destination_url
                 project.configures.configs[index].request.destination_path = updateProjectDTO.config.request.destination_path
