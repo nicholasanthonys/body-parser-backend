@@ -5,19 +5,26 @@ import ProjectController from '../modules/Project/Controller/ProjectController'
 import IUpdateProjectDTO from "src/modules/Project/DTO/UpdateProjectDTO";
 import IStoreProjectDTO from 'src/modules/Project/DTO/StoreProjectDTO'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/StoreParallelDTO";
-import { IStoreSerialDTO,  IUpdateSingleConfigureFileSerialDTO, IStoreSingleSerialConfigDTO } from "src/modules/SerialParallel/DTO/StoreSerialDTO"
+import { IStoreSerialDTO, IUpdateSingleConfigureFileSerialDTO, IStoreSingleSerialConfigDTO } from "src/modules/SerialParallel/DTO/StoreSerialDTO"
 import ParallelController from "src/modules/SerialParallel/Controller/ParallelController";
-import {  storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleCLogicSerialValidation, storeSingleConfigParallelValidation, storeSingleConfigSerialValidation, updateSingleCLogicParallelValidation, updateSingleCLogicSerialValidation, updateSingleConfigParallelValidation, updateSingleConfigSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
+import { storeOrUpdateParallelValidation, storeOrUpdateSerialValidation, storeResponseValidation, storeSingleCLogicParallelValidation, storeSingleCLogicSerialValidation, storeSingleConfigParallelValidation, storeSingleConfigSerialValidation, updateSingleCLogicParallelValidation, updateSingleCLogicSerialValidation, updateSingleConfigParallelValidation, updateSingleConfigSerialValidation } from "src/modules/SerialParallel/validation/SerialorParallelRequestValidation";
 import SerialController from "src/modules/SerialParallel/Controller/SerialController";
 import { IUpdateSingleConfigParallelDTO } from "src/modules/SerialParallel/DTO/UpdateParallelDTO";
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from "src/modules/SerialParallel/DTO/CLogicDTO";
 import { IResponseDTO } from "src/modules/SerialParallel/DTO/StoreResponseDTO";
+import { decode } from "jsonwebtoken";
+import CLogicController from "src/modules/CLogic/CLogicController";
+import ConfigureController from "src/modules/Configure/controller/ConfigureController";
+import ConfigureFileController from "src/modules/ConfigureFile/ConfigureFileController";
 
 const router = Router();
 
 const projectControler = new ProjectController();
 const parallelController = new ParallelController();
-const serialController = new SerialController
+const serialController = new SerialController();
+const cLogicController = new CLogicController();
+const configureController = new ConfigureController();
+const configureFileController = new ConfigureFileController();
 
 //* Store a project
 router.post("/", async (req: Request, res: Response) => {
@@ -482,6 +489,34 @@ router.put("/", async (req: Request, res: Response) => {
     }
     return res.sendStatus(403).send({ message: "Not authenticated" });
 });
+
+router.delete('/:id/parallel/configure-file/:configureFileId', async (req: Request, res: Response) => {
+    const user = decodeToken(req);
+    const { id, configureFileId} = req.params
+    if (!user) {
+        return res.sendStatus(401);
+    }
+    let result = await configureFileController.deleteConfigureFileParallel(id,user.id,configureFileId)
+    if (result) {
+        return res.status(201).send({ message: 'Delete Success' })
+    }
+    return res.status(400).send({ message: 'Project not found' })
+})
+
+
+router.delete('/:id/parallel/clogic/:cLogicId', async (req: Request, res: Response) => {
+    const user = decodeToken(req);
+    const { id, cLogicId } = req.params
+    if (!user) {
+        return res.sendStatus(401);
+    }
+    let result = await cLogicController.deleteCLogicParallel(id, user.id, cLogicId)
+    if (result) {
+        return res.status(201).send({ message: 'Delete Success' })
+    }
+    return res.status(400).send({ message: 'Project not found' })
+})
+
 
 //* Delete a project
 router.delete("/:id", async (req: Request, res: Response) => {
