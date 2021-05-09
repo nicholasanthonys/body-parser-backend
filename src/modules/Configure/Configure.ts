@@ -62,6 +62,7 @@ fieldDeleteSchema.set('toJSON', {
 });
 
 export interface ICommandRequest extends Document {
+    loop : string | null,
     destination_url: string,
     destination_path: string | null,
     method: string,
@@ -76,6 +77,11 @@ export interface ICommandRequest extends Document {
 
 
 export const requestConfigSchema = new Schema({
+    loop : {
+        type : String,
+        required : false,
+        default : null 
+    },
     destination_url: {
         type: String,
         required: true,
