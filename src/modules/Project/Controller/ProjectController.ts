@@ -27,8 +27,6 @@ export default class ProjectController {
     }
 
     async show(projectId: string, userId : string): Promise<IProject> {
-        console.log("projectId is ")
-        console.log(projectId)
         return await Project.findById({
             _id : projectId,
             userId
