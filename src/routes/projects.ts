@@ -518,6 +518,34 @@ router.delete('/:id/parallel/clogic/:cLogicId', async (req: Request, res: Respon
 })
 
 
+router.delete('/:id/serial/configure-file/:configureFileId', async (req: Request, res: Response) => {
+    const user = decodeToken(req);
+    const { id, configureFileId} = req.params
+    if (!user) {
+        return res.sendStatus(401);
+    }
+    let result = await configureFileController.deleteConfigureFileSerial(id,user.id,configureFileId)
+    if (result) {
+        return res.status(201).send({ message: 'Delete Success' })
+    }
+    return res.status(400).send({ message: 'Project not found' })
+})
+
+
+router.delete('/:id/serial/config/:configId/clogic/:cLogicId', async (req: Request, res: Response) => {
+    const user = decodeToken(req);
+    const { id, configId, cLogicId } = req.params
+    if (!user) {
+        return res.sendStatus(401);
+    }
+    let result = await cLogicController.deleteCLogicSerial(id, user.id, configId, cLogicId)
+    if (result) {
+        return res.status(201).send({ message: 'Delete Success' })
+    }
+    return res.status(400).send({ message: 'Project not found' })
+})
+
+
 //* Delete a project
 router.delete("/:id", async (req: Request, res: Response) => {
 
