@@ -3,6 +3,7 @@ import Joi from 'joi';
 
 
 export const configRequestSchema = Joi.object({
+    loop : Joi.string().allow(null, ""),
     destination_url: Joi.string().required(),
     destination_path: Joi.string().allow(null, ""),
     transform: Joi.string().required(),
