@@ -7,5 +7,10 @@ declare namespace NodeJS {
         ACCESS_TOKEN_LIFE:string
         REFRESH_TOKEN_SECRET:Secret
         REFRESH_TOKEN_LIFE:Number
+        DOCKERFILE_DIR : string
+        DOCKER_NETWORK_NAME : string
+        DOCKER_CONTAINER_VOLUME_MOUNTPOINT : string
+        TMP_PATH : string
+        
     }
 }
