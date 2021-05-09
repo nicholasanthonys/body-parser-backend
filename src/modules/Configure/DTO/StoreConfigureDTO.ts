@@ -9,6 +9,7 @@ export default interface IStoreConfigureDTO {
 
 
 interface IConfigureRequest {
+    loop : string | null,
     destination_url: string,
     destination_path: string | null
     method: string,
