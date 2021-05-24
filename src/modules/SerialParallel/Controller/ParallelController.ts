@@ -91,7 +91,8 @@ export default class ParallelController {
         if (index != undefined && index >= 0) {
             if (project.parallel) {
                 project.parallel.configures[index].configure_id = storeSingleConfigParallelDTO.configure_id
-                project.parallel.configures[index].alias = storeSingleConfigParallelDTO.alias
+                project.parallel.configures[index].alias = storeSingleConfigParallelDTO.alias,
+                project.parallel.configures[index].loop = storeSingleConfigParallelDTO.loop
                 await project.save();
                 return project.parallel.configures[index]
             }
