@@ -5,6 +5,7 @@ export const storeOrUpdateParallelValidation = (data: Request): ValidationResult
         configures: Joi.array().items({
             configure_id: Joi.string().required(),
             alias: Joi.string().required(),
+            loop : Joi.string().allow(null)
         }).required(),
         c_logics: Joi.array().items({
             rule: Joi.object().allow(null),
@@ -88,6 +89,7 @@ export const updateSingleConfigParallelValidation = (data: Request): ValidationR
         id: Joi.string().required(),
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
+        loop : Joi.string().allow(null)
     })
     return schema.validate(data)
 }
