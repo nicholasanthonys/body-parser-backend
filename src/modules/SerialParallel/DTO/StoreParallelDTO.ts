@@ -16,6 +16,7 @@ export interface IStoreSingleConfigParallelDTO {
 interface configureFileParallelDTO {
     configure_id: string,
     alias: string,
+    loop : string | null
 }
 
 
