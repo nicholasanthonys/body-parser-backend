@@ -65,7 +65,7 @@ export default class SerialController {
                 project.serial.configures[confIndex].c_logics[cLogicIndex].rule = storeCLogicDTO.rule
                 project.serial.configures[confIndex].c_logics[cLogicIndex].data = storeCLogicDTO.data
                 project.serial.configures[confIndex].c_logics[cLogicIndex].next_success = storeCLogicDTO.next_success
-                if (project.serial.configures[confIndex].c_logics[cLogicIndex].response) {
+                if (storeCLogicDTO.response) {
                     project.serial.configures[confIndex].c_logics[cLogicIndex].response = new FinalResponse({
                         status_code: storeCLogicDTO.response.status_code,
                         transform: storeCLogicDTO.response.transform,
