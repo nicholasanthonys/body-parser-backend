@@ -11,7 +11,6 @@ export default interface IUpdateConfigureDTO {
 
 
 interface IConfigureRequest {
-    loop : string | null,
     destination_url: string,
     destination_path: string | null
     method: string,
