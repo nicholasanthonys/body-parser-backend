@@ -1,6 +1,7 @@
 import { model, Schema, Document } from "mongoose";
 
 export interface IConfigureFile extends Document {
+    loop : String | null
     configure_id: String
     file_name : String,
     alias: String
@@ -20,7 +21,11 @@ export const configureFileSchema = new Schema({
         type: Schema.Types.String,
         required: true,
     },
-
+    loop : {
+        type: Schema.Types.String,
+        required: false,
+        default : null
+    },
     date: {
         type: Date,
         default: Date.now,
