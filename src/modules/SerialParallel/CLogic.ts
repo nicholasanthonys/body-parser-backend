@@ -8,7 +8,9 @@ export interface ICLogic extends Document {
     rule: Object
     data: Object | null;
     next_success: string | null;
-    response: IFinalResponseConfig | null
+    response: IFinalResponseConfig | null,
+    next_failure: string | null,
+    failure_response: IFinalResponseConfig | null,
 }
 
 export const cLogicSchema = new Schema({
@@ -28,6 +30,16 @@ export const cLogicSchema = new Schema({
         default: null,
     },
     response: {
+        type: finalResponseConfigSchema,
+        default: null,
+        required: false
+    },
+    next_failure: {
+        type: String,
+        required: false,
+        default: null,
+    },
+    failure_response: {
         type: finalResponseConfigSchema,
         default: null,
         required: false

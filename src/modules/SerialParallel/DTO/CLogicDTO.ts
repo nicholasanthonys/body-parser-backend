@@ -4,7 +4,9 @@ export interface IStoreSingleCLogicItemDTO {
     rule: Object,
     data: Object,
     next_success: string | null,
-    response:IResponseDTO 
+    response:IResponseDTO ,
+    next_failure: string | null,
+    failure_response:IResponseDTO 
 }
 
 export interface IUpdateSingleCLogicItemDTO {
@@ -12,7 +14,9 @@ export interface IUpdateSingleCLogicItemDTO {
     rule: Object,
     data: Object,
     next_success: string | null,
-    response:IResponseDTO 
+    response:IResponseDTO ,
+    next_failure: string | null,
+    failure_response:IResponseDTO 
 }
 
 

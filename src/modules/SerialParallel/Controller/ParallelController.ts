@@ -73,7 +73,9 @@ export default class ParallelController {
             rule: storeSingleCLogicParallelDTO.rule,
             data: storeSingleCLogicParallelDTO.data,
             next_success: storeSingleCLogicParallelDTO.next_success,
-            response: storeSingleCLogicParallelDTO.response
+            response: storeSingleCLogicParallelDTO.response,
+            next_failure: storeSingleCLogicParallelDTO.next_failure,
+            failure_response: storeSingleCLogicParallelDTO.failure_response
         }));
 
         await project.save();
@@ -122,6 +124,14 @@ export default class ParallelController {
                         adds: updateSingleCLogicParallelDTO.response.adds,
                         modifies: updateSingleCLogicParallelDTO.response.modifies,
                         deletes: updateSingleCLogicParallelDTO.response.deletes,
+                    }),
+                    project.parallel.c_logics[index].next_failure= updateSingleCLogicParallelDTO.next_failure,
+                    project.parallel.c_logics[index].failure_response= new FinalResponse({
+                        status_code: updateSingleCLogicParallelDTO.failure_response.status_code,
+                        transform: updateSingleCLogicParallelDTO.failure_response.transform,
+                        adds: updateSingleCLogicParallelDTO.failure_response.adds,
+                        modifies: updateSingleCLogicParallelDTO.failure_response.modifies,
+                        deletes: updateSingleCLogicParallelDTO.failure_response.deletes,
                     })
                 await project.save();
                 return project.parallel.c_logics[index]
@@ -171,7 +181,9 @@ export default class ParallelController {
                     rule: element.rule,
                     data: element.data,
                     next_success: element.next_success,
-                    response: element.response
+                    response: element.response,
+                    next_failure: element.next_failure,
+                    failure_response: element.failure_response
                 })
                 project.parallel?.c_logics.push(cLogicItem)
             })

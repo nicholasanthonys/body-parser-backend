@@ -273,7 +273,7 @@ router.post("/:project_id/parallel", async (req: Request, res: Response) => {
     }
 });
 
-router.post("/:project_id/parallel/next-failure", async (req: Request, res: Response) => {
+router.post("/:project_id/parallel/failure-response", async (req: Request, res: Response) => {
     const storeNextFailureDTO = req.body as IResponseDTO;
     const { project_id } = req.params;
     const user = decodeToken(req);
