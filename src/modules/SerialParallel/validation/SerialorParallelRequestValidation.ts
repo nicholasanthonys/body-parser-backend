@@ -11,7 +11,9 @@ export const storeOrUpdateParallelValidation = (data: Request): ValidationResult
             rule: Joi.object().allow(null),
             data: Joi.object().allow(null),
             next_success: Joi.string().allow(null, ""),
-            response: responseSchema.allow(null)
+            response: responseSchema.allow(null),
+            next_failure: Joi.string().allow(null, ""),
+            failure_response: responseSchema.allow(null)
         }).required(),
         failure_response: responseSchema.required().required(),
 
@@ -28,7 +30,9 @@ export const storeOrUpdateSerialValidation = (data: Request): ValidationResult =
                 rule: Joi.object().allow(null),
                 data: Joi.object().allow(null),
                 next_success: Joi.string().allow(null, ""),
-                response: responseSchema.allow(null)
+                response: responseSchema.allow(null),
+                next_failure: Joi.string().allow(null, ""),
+                failure_response: responseSchema.allow(null)
             }).required(),
             failure_response: responseSchema.required().required(),
         }).required(),
@@ -60,7 +64,9 @@ export const storeSingleCLogicSerialValidation = (data: Request): ValidationResu
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
@@ -71,7 +77,9 @@ export const updateSingleCLogicSerialValidation = (data: Request): ValidationRes
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
@@ -99,7 +107,9 @@ export const storeSingleCLogicParallelValidation = (data: Request): ValidationRe
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
@@ -110,7 +120,9 @@ export const updateSingleCLogicParallelValidation = (data: Request): ValidationR
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
