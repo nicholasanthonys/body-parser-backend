@@ -88,7 +88,7 @@ export const cLogicSchema = Joi.object({
 
 export const parallelSchema = Joi.object({
     configures: Joi.array().items(configureFileSchema),
-    next_failure: configResponseSchema,
+    failure_response: configResponseSchema,
     c_logics: Joi.array().items(cLogicSchema)
 })
 

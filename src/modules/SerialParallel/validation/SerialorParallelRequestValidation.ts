@@ -13,7 +13,7 @@ export const storeOrUpdateParallelValidation = (data: Request): ValidationResult
             next_success: Joi.string().allow(null, ""),
             response: responseSchema.allow(null)
         }).required(),
-        next_failure: responseSchema.required().required(),
+        failure_response: responseSchema.required().required(),
 
     })
     return schema.validate(data)
@@ -30,7 +30,7 @@ export const storeOrUpdateSerialValidation = (data: Request): ValidationResult =
                 next_success: Joi.string().allow(null, ""),
                 response: responseSchema.allow(null)
             }).required(),
-            next_failure: responseSchema.required().required(),
+            failure_response: responseSchema.required().required(),
         }).required(),
     })
     return schema.validate(data)
@@ -40,7 +40,7 @@ export const storeSingleConfigSerialValidation = (data: Request): ValidationResu
     const schema = Joi.object({
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
-        next_failure: responseSchema.required().required(),
+        failure_response: responseSchema.required().required(),
     })
     return schema.validate(data)
 }
@@ -50,7 +50,7 @@ export const updateSingleConfigSerialValidation = (data: Request): ValidationRes
         id : Joi.string().required(),
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
-        next_failure: responseSchema.required().required(),
+        failure_response: responseSchema.required().required(),
     })
     return schema.validate(data)
 }

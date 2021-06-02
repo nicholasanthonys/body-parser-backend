@@ -11,6 +11,7 @@ declare namespace NodeJS {
         DOCKER_NETWORK_NAME : string
         DOCKER_CONTAINER_VOLUME_MOUNTPOINT : string
         TMP_PATH : string
+        SINGLE_MIDDLEWARE_IMAGE_NAME : string
         
     }
 }

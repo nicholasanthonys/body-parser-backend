@@ -1,6 +1,7 @@
 import { Schema, Document, model } from 'mongoose';
-import { IProject } from '../Project/Project';
 import { finalResponseConfigSchema, IFinalResponseConfig } from '../Response';
+import { cLogicSchema,ICLogic } from '../SerialParallel/CLogic';
+
 
 
 
@@ -9,6 +10,7 @@ export interface IField extends Document {
     header: Object,
     body: Object,
     query: Object,
+    c_logics : Array<ICLogic>
 }
 
 const fieldSchema = new Schema({
@@ -142,8 +144,13 @@ export const requestConfigSchema = new Schema({
             body : [],
             query : [],
         
-        }
-    }
+        },
+    },
+    c_logics : {
+        type : [cLogicSchema],
+        required : true,
+        default : [],
+    },
 }, { _id: false, id: false });
 
 //* remove _id and _v from commandSchema when returning to JSON
