@@ -20,3 +20,13 @@ export interface IUpdateSingleCLogicItemDTO {
 }
 
 
+export interface IStoreRequestSingleCLogicItemDTO {
+    project_id : string
+    c_logic : IStoreSingleCLogicItemDTO
+}
+
+export interface IUpdateConfigureSingleCLogicItemDTO {
+    project_id : string
+    c_logic : IUpdateSingleCLogicItemDTO
+}
+

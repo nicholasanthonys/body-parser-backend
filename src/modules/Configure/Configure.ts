@@ -72,7 +72,8 @@ export interface ICommandRequest extends Document {
     log_after_modify: Object,
     adds: IField,
     modifies: IField,
-    deletes: IDeleteField
+    deletes: IDeleteField,
+    c_logics : Array<ICLogic>
 }
 
 

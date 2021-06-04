@@ -1,22 +1,25 @@
 import { IProject, Project } from "src/modules/Project/Project";
+import { FinalResponse } from "src/modules/Response";
+import { CLogic, ICLogic } from "src/modules/SerialParallel/CLogic";
+import { IStoreRequestSingleCLogicItemDTO, IStoreSingleCLogicItemDTO, IUpdateConfigureSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from "src/modules/SerialParallel/DTO/CLogicDTO";
 import { Config, Configure, IConfig, IConfigure } from "../Configure";
 import IStoreConfigureDTO from "../DTO/StoreConfigureDTO";
 import IUpdateConfigureDTO from "../DTO/UpdateConfigureDTO";
 
 export default class ConfigureController {
 
-    async store(storeConfigureDTO: IStoreConfigureDTO, userId: string): Promise<IConfig| null> {
+    async store(storeConfigureDTO: IStoreConfigureDTO, userId: string): Promise<IConfig | null> {
         const project = await Project.findOne({ _id: storeConfigureDTO.project_id, userId }) as IProject;
         // const project = await Project.findOne({ _id: projectId, userId }) as IProject;
         // project.configures.confi
         if (project) {
             const newConfig = new Config({
-                description : storeConfigureDTO.config.description,
+                description: storeConfigureDTO.config.description,
                 request: storeConfigureDTO.config.request,
                 response: storeConfigureDTO.config.response
             })
             project.configures.configs.push(newConfig);
-        
+
             await project.save();
             return newConfig
         }
@@ -46,7 +49,7 @@ export default class ConfigureController {
         return null
     }
 
-    async update(updateProjectDTO: IUpdateConfigureDTO, configureId: string, userId: string): Promise<IConfig| null> {
+    async update(updateProjectDTO: IUpdateConfigureDTO, configureId: string, userId: string): Promise<IConfig | null> {
         const project = await Project.findOne({ _id: updateProjectDTO.project_id, userId }) as IProject
         if (project) {
             let index = project.configures.configs.findIndex((element) => element._id == configureId);
@@ -74,7 +77,7 @@ export default class ConfigureController {
                 project.configures.configs[index].request.deletes.query = updateProjectDTO.config.request.deletes.query
 
 
-                project.configures.configs[index].response.status_code= updateProjectDTO.config.response.status_code
+                project.configures.configs[index].response.status_code = updateProjectDTO.config.response.status_code
 
                 project.configures.configs[index].response.transform = updateProjectDTO.config.response.transform
                 project.configures.configs[index].response.log_before_modify = updateProjectDTO.config.response.log_before_modify
@@ -105,5 +108,84 @@ export default class ConfigureController {
             return true
         }
         return false;
+    }
+
+
+    async storeSingleCLogicRequest(storeSingleCLogicRequestDTO: IStoreRequestSingleCLogicItemDTO, configureId: string, userId: string): Promise<ICLogic | null | undefined> {
+        const project = await Project.findOne({ _id: storeSingleCLogicRequestDTO.project_id, userId }) as IProject
+        if (project) {
+            let index = project.configures.configs.findIndex((element) => element._id == configureId);
+            if (index >= 0) {
+                project.configures.configs[index].request.c_logics.push(new CLogic({
+                    rule: storeSingleCLogicRequestDTO.c_logic.rule,
+                    data: storeSingleCLogicRequestDTO.c_logic.data,
+                    next_success: storeSingleCLogicRequestDTO.c_logic.next_success,
+                    response: storeSingleCLogicRequestDTO.c_logic.response,
+                    next_failure: storeSingleCLogicRequestDTO.c_logic.next_failure,
+                    failure_response: storeSingleCLogicRequestDTO.c_logic.failure_response
+                }));
+
+                console.log("Clogic is ")
+                console.log(project.configures.configs[index].request.c_logics)
+                console.log("clogic dto")
+                console.log(storeSingleCLogicRequestDTO.c_logic)
+                await project.save();
+                return project.configures.configs[index].request.c_logics[project.configures.configs[index].request.c_logics.length - 1]
+            }
+        }
+
+        return null;
+
+
+
+    }
+
+
+    async updateSingleCLogicRequest(updateSingleCLogicRequestDTO: IUpdateConfigureSingleCLogicItemDTO, userId: string, configureId: string): Promise<ICLogic | null | undefined> {
+        const project = await Project.findOne({ _id: updateSingleCLogicRequestDTO.project_id, userId }) as IProject
+        if (project) {
+            let index = project.configures.configs.findIndex((element) => element._id == configureId);
+            if (index >= 0) {
+                let cLogicIndex = project.configures.configs[index].request.c_logics.findIndex(e => e._id == updateSingleCLogicRequestDTO.c_logic.id);
+                if (cLogicIndex >= 0) {
+                    project.configures.configs[index].request.c_logics[cLogicIndex].rule = updateSingleCLogicRequestDTO.c_logic.rule
+                    project.configures.configs[index].request.c_logics[cLogicIndex].data = updateSingleCLogicRequestDTO.c_logic.data
+                    project.configures.configs[index].request.c_logics[cLogicIndex].next_success = updateSingleCLogicRequestDTO.c_logic.next_success
+
+                    if (project.configures.configs[index].request.c_logics[cLogicIndex].response != null) {
+                        project.configures.configs[index].request.c_logics[cLogicIndex].response = new FinalResponse({
+                            status_code: updateSingleCLogicRequestDTO.c_logic.response.status_code,
+                            transform: updateSingleCLogicRequestDTO.c_logic.response.transform,
+                            adds: updateSingleCLogicRequestDTO.c_logic.response.adds,
+                            modifies: updateSingleCLogicRequestDTO.c_logic.response.modifies,
+                            deletes: updateSingleCLogicRequestDTO.c_logic.response.deletes,
+                        })
+
+                    }else{
+                        project.configures.configs[index].request.c_logics[cLogicIndex].response = null
+                    }
+
+                    project.configures.configs[index].request.c_logics[cLogicIndex].next_failure = updateSingleCLogicRequestDTO.c_logic.next_failure
+
+                    if (project.configures.configs[index].request.c_logics[cLogicIndex].failure_response != null) {
+                        project.configures.configs[index].request.c_logics[cLogicIndex].failure_response = new FinalResponse({
+                            status_code: updateSingleCLogicRequestDTO.c_logic.failure_response.status_code,
+                            transform: updateSingleCLogicRequestDTO.c_logic.failure_response.transform,
+                            adds: updateSingleCLogicRequestDTO.c_logic.failure_response.adds,
+                            modifies: updateSingleCLogicRequestDTO.c_logic.failure_response.modifies,
+                            deletes: updateSingleCLogicRequestDTO.c_logic.failure_response.deletes,
+                        })
+                    }else{
+                        project.configures.configs[index].request.c_logics[cLogicIndex].failure_response = null
+                    }
+
+                    await project.save();
+                    return project.configures.configs[index].request.c_logics[cLogicIndex]
+                }
+            }
+        } else {
+            console.log("project not found")
+        }
+        return null;
     }
 }

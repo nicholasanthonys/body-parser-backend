@@ -2,36 +2,6 @@ import Joi from 'joi';
 
 
 
-export const configRequestSchema = Joi.object({
-    loop : Joi.string().allow(null, ""),
-    destination_url: Joi.string().required(),
-    destination_path: Joi.string().allow(null, ""),
-    transform: Joi.string().required(),
-    log_before_modify: Joi.object(),
-    log_after_modify: Joi.object(),
-    method: Joi.string(),
-    adds: Joi.object({
-        header: Joi.object(),
-        body: Joi.object(),
-        query: Joi.object(),
-        param: Joi.object(),
-
-    }),
-    modifies: Joi.object({
-        header: Joi.object(),
-        body: Joi.object(),
-        query: Joi.object(),
-        param: Joi.object(),
-
-    }),
-    deletes: Joi.object({
-        header: Joi.array().items(Joi.string()),
-        body: Joi.array().items(Joi.string()),
-        query: Joi.array().items(Joi.string()),
-        param: Joi.array().items(Joi.string()),
-
-    })
-})
 
 
 
@@ -79,20 +49,64 @@ export const configureFileSchema = Joi.object({
 })
 
 
-export const cLogicSchema = Joi.object({
+export const storeCLogicSchema = Joi.object({
     rule: Joi.object(),
     data: Joi.object(),
-    next_success: Joi.string(),
-    response: configResponseSchema
+    next_success: Joi.string().allow('', null),
+    response: configResponseSchema.allow(null),
+    next_failure: Joi.string().allow('', null),
+    failure_response: configResponseSchema.allow(null)
+})
+
+export const updateCLogicSchema = Joi.object({
+    id : Joi.string().required(),
+    rule: Joi.object(),
+    data: Joi.object(),
+    next_success: Joi.string().allow('', null),
+    response: configResponseSchema.allow(null),
+    next_failure: Joi.string().allow('', null),
+    failure_response: configResponseSchema.allow(null)
 })
 
 export const parallelSchema = Joi.object({
     configures: Joi.array().items(configureFileSchema),
     failure_response: configResponseSchema,
-    c_logics: Joi.array().items(cLogicSchema)
+    c_logics: Joi.array().items(storeCLogicSchema)
 })
 
 export const baseOption = Joi.object({
     project_max_circular: Joi.number().required(),
     circular_response: configResponseSchema
+})
+
+
+export const configRequestSchema = Joi.object({
+    destination_url: Joi.string().required(),
+    destination_path: Joi.string().allow(null, ""),
+    transform: Joi.string().required(),
+    log_before_modify: Joi.object(),
+    log_after_modify: Joi.object(),
+    method: Joi.string(),
+    adds: Joi.object({
+        header: Joi.object(),
+        body: Joi.object(),
+        query: Joi.object(),
+        param: Joi.object(),
+
+    }),
+    modifies: Joi.object({
+        header: Joi.object(),
+        body: Joi.object(),
+        query: Joi.object(),
+        param: Joi.object(),
+
+    }),
+    deletes: Joi.object({
+        header: Joi.array().items(Joi.string()),
+        body: Joi.array().items(Joi.string()),
+        query: Joi.array().items(Joi.string()),
+        param: Joi.array().items(Joi.string()),
+
+    }),
+    c_logics : Joi.array().items(storeCLogicSchema)
 })
