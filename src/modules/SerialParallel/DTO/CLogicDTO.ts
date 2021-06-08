@@ -30,3 +30,7 @@ export interface IUpdateConfigureSingleCLogicItemDTO {
     c_logic : IUpdateSingleCLogicItemDTO
 }
 
+export interface IDeleteConfigureSingleCLogicItemDTO {
+    project_id : string
+    id : string
+}
