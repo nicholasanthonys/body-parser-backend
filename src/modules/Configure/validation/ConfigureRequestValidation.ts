@@ -46,4 +46,12 @@ export const updateRequestCLogiValidation = (data: Request): ValidationResult =>
     return schema.validate(data)
 }
 
+export const deleteRequestCLogiValidation = (data: Request): ValidationResult => {
+    const schema = Joi.object({
+        project_id: Joi.string().required(),
+        id: Joi.string().required()
+    })
+    return schema.validate(data)
+}
+
 
