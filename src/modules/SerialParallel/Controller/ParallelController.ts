@@ -57,7 +57,8 @@ export default class ParallelController {
         }
         project.parallel?.configures.push(new ConfigureFile({
             configure_id: storeSingleConfigParallelDTO.configure_id,
-            alias: storeSingleConfigParallelDTO.alias
+            alias: storeSingleConfigParallelDTO.alias,
+            loop : storeSingleConfigParallelDTO.loop
         }));
 
         await project.save();

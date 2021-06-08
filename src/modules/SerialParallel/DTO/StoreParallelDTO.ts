@@ -9,7 +9,8 @@ export interface IStoreParallelDTO {
 
 export interface IStoreSingleConfigParallelDTO {
     configure_id : string,
-    alias : string
+    alias : string,
+    loop : string | null,
 }
 
 
