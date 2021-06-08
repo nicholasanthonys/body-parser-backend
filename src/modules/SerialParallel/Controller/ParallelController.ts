@@ -5,7 +5,7 @@ import { ConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSer
 import { CLogic, ICLogic } from 'src/modules/SerialParallel/CLogic'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from '../DTO/StoreParallelDTO'
 import { IParallel, Parallel } from '../Parallel';
-import { ConfigureFile, IConfigureFile} from '../ConfigureFile';
+import { ConfigureFile, IConfigureFile } from '../ConfigureFile';
 
 import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateParallelDTO';
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO'
@@ -50,7 +50,7 @@ export default class ParallelController {
         return null;
     }
 
-    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
+    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile | null | undefined> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null;
@@ -82,7 +82,7 @@ export default class ParallelController {
         return project.parallel?.c_logics[project.parallel.c_logics.length - 1]
     }
 
-    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
+    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile | null | undefined> {
         let project = await this.projectController.show(projectId, userId);
 
         if (!project) {
@@ -94,7 +94,7 @@ export default class ParallelController {
             if (project.parallel) {
                 project.parallel.configures[index].configure_id = storeSingleConfigParallelDTO.configure_id
                 project.parallel.configures[index].alias = storeSingleConfigParallelDTO.alias,
-                project.parallel.configures[index].loop = storeSingleConfigParallelDTO.loop
+                    project.parallel.configures[index].loop = storeSingleConfigParallelDTO.loop
                 await project.save();
                 return project.parallel.configures[index]
             }
@@ -115,24 +115,37 @@ export default class ParallelController {
         let index = project.parallel?.c_logics.findIndex(e => e._id == updateSingleCLogicParallelDTO.id);
         if (index != undefined && index >= 0) {
             if (project.parallel) {
-                project.parallel.c_logics[index].rule = updateSingleCLogicParallelDTO.rule,
-                    project.parallel.c_logics[index].data = updateSingleCLogicParallelDTO.data,
-                    project.parallel.c_logics[index].next_success = updateSingleCLogicParallelDTO.next_success,
+                project.parallel.c_logics[index].rule = updateSingleCLogicParallelDTO.rule
+                project.parallel.c_logics[index].data = updateSingleCLogicParallelDTO.data
+                project.parallel.c_logics[index].next_success = updateSingleCLogicParallelDTO.next_success
+
+                if (updateSingleCLogicParallelDTO.response) {
                     project.parallel.c_logics[index].response = new FinalResponse({
                         status_code: updateSingleCLogicParallelDTO.response.status_code,
                         transform: updateSingleCLogicParallelDTO.response.transform,
                         adds: updateSingleCLogicParallelDTO.response.adds,
                         modifies: updateSingleCLogicParallelDTO.response.modifies,
                         deletes: updateSingleCLogicParallelDTO.response.deletes,
-                    }),
-                    project.parallel.c_logics[index].next_failure= updateSingleCLogicParallelDTO.next_failure,
-                    project.parallel.c_logics[index].failure_response= new FinalResponse({
+                    })
+
+                } else {
+                    project.parallel.c_logics[index].response = null
+                }
+
+                project.parallel.c_logics[index].next_failure = updateSingleCLogicParallelDTO.next_failure
+                if (updateSingleCLogicParallelDTO.failure_response) {
+                    project.parallel.c_logics[index].failure_response = new FinalResponse({
                         status_code: updateSingleCLogicParallelDTO.failure_response.status_code,
                         transform: updateSingleCLogicParallelDTO.failure_response.transform,
                         adds: updateSingleCLogicParallelDTO.failure_response.adds,
                         modifies: updateSingleCLogicParallelDTO.failure_response.modifies,
                         deletes: updateSingleCLogicParallelDTO.failure_response.deletes,
                     })
+
+                } else {
+                    project.parallel.c_logics[index].failure_response = null
+                }
+
                 await project.save();
                 return project.parallel.c_logics[index]
             }
