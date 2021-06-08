@@ -161,7 +161,7 @@ export default class ConfigureController {
                             deletes: updateSingleCLogicRequestDTO.c_logic.response.deletes,
                         })
 
-                    }else{
+                    } else {
                         project.configures.configs[index].request.c_logics[cLogicIndex].response = null
                     }
 
@@ -175,7 +175,7 @@ export default class ConfigureController {
                             modifies: updateSingleCLogicRequestDTO.c_logic.failure_response.modifies,
                             deletes: updateSingleCLogicRequestDTO.c_logic.failure_response.deletes,
                         })
-                    }else{
+                    } else {
                         project.configures.configs[index].request.c_logics[cLogicIndex].failure_response = null
                     }
 
@@ -187,5 +187,23 @@ export default class ConfigureController {
             console.log("project not found")
         }
         return null;
+    }
+
+
+    async deleteCLogic(projectId: string, userId: string, configId: string, cLogicId: string): Promise<boolean> {
+
+        const project = await Project.findOne({ _id: projectId, userId }) as IProject
+        if (!project) {
+            return false;
+        }
+        let index = project.configures.configs.findIndex((element) => element._id == configId);
+        console.log("config id is ")
+        console.log(configId)
+        if (index >= 0) {
+            project.configures.configs[index].request.c_logics = project.configures.configs[index].request.c_logics.filter(cLogic => cLogic._id != cLogicId)
+            await project.save()
+            return true;
+        }
+        return false;
     }
 }
