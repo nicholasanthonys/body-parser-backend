@@ -74,6 +74,7 @@ export const storeSingleConfigParallelValidation = (data: Request): ValidationRe
     const schema = Joi.object({
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
+        loop: Joi.string().allow(null)
     })
     return schema.validate(data)
 }
