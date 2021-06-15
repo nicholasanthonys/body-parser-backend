@@ -234,6 +234,8 @@ build
 *.rest
 
 tmp/
+
+.idea/
 .idea/.gitignore
 .idea/express-body-parser-backend.iml
 .idea/misc.xml
