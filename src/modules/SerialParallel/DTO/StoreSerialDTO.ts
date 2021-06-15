@@ -8,7 +8,7 @@ export interface IStoreSerialDTO {
 export interface ISerialConfigDTO {
     configure_id: string,
     alias: string,
-    next_failure: IResponseDTO,
+    failure_response: IResponseDTO,
     c_logics : Array<IStoreSingleCLogicItemDTO>
 }
 
@@ -16,13 +16,13 @@ export interface ISerialConfigDTO {
 export interface IStoreSingleSerialConfigDTO {
     configure_id: string,
     alias: string,
-    next_failure: IResponseDTO,
+    failure_response: IResponseDTO,
 }
 export interface IUpdateSingleConfigureFileSerialDTO {
     id : string,
     configure_id: string,
     alias: string,
-    next_failure: IResponseDTO,
+    failure_response: IResponseDTO,
 }
 
 

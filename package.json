@@ -26,6 +26,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/config": "0.0.38",
     "@types/dockerode": "^3.2.2",
     "@types/jsonfile": "^6.0.0",
     "@types/jsonwebtoken": "^8.5.0",
@@ -33,6 +34,7 @@
     "@types/shelljs": "^0.8.8",
     "@types/uuid": "^8.3.0",
     "bcrypt": "^5.0.0",
+    "config": "^3.3.6",
     "cors": "^2.8.5",
     "dockerode": "^3.2.1",
     "dotenv": "^8.2.0",
@@ -41,6 +43,7 @@
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.12",
+    "node-ssh": "^11.1.1",
     "shelljs": "^0.8.4",
     "tsconfig-paths": "^3.9.0",
     "uuid": "^8.3.2"

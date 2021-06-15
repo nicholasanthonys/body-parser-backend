@@ -6,7 +6,7 @@ import {ConfigureFile, IConfigureFile} from "src/modules/SerialParallel/Configur
 
 export interface IConfigureFileSerial extends IConfigureFile,  Document {
     c_logics : Array<ICLogic>
-    next_failure : IFinalResponseConfig
+    failure_response : IFinalResponseConfig
 }
 
 export const configureFileSerialSchema = ConfigureFile.discriminator('ConfigureFileSerial', new Schema({
@@ -15,7 +15,7 @@ export const configureFileSerialSchema = ConfigureFile.discriminator('ConfigureF
         required : true,
         default : [],
     },
-    next_failure : {
+    failure_response : {
         type : finalResponseConfigSchema,
         required : true,
     },

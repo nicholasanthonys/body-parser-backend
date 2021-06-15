@@ -57,7 +57,7 @@ const projectSchema = new Schema({
         default: {
             c_logics: [],
             configures: [],
-            next_failure: {
+            failure_response: {
                 status_code: '200',
                 transform:
                     "ToJson",

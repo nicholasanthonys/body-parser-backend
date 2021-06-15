@@ -1,19 +1,15 @@
 import Joi, { ValidationResult } from 'joi';
+import { storeCLogicSchema } from 'src/validation/schema';
 
 export const storeOrUpdateParallelValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
         configures: Joi.array().items({
             configure_id: Joi.string().required(),
             alias: Joi.string().required(),
-            loop : Joi.string().allow(null)
+            loop: Joi.string().allow(null)
         }).required(),
-        c_logics: Joi.array().items({
-            rule: Joi.object().allow(null),
-            data: Joi.object().allow(null),
-            next_success: Joi.string().allow(null, ""),
-            response: responseSchema.allow(null)
-        }).required(),
-        next_failure: responseSchema.required().required(),
+        c_logics: Joi.array().items(storeCLogicSchema).required(),
+        failure_response: responseSchema.required().required(),
 
     })
     return schema.validate(data)
@@ -24,13 +20,7 @@ export const storeOrUpdateSerialValidation = (data: Request): ValidationResult =
         configures: Joi.array().items({
             configure_id: Joi.string().required(),
             alias: Joi.string().required(),
-            c_logics: Joi.array().items({
-                rule: Joi.object().allow(null),
-                data: Joi.object().allow(null),
-                next_success: Joi.string().allow(null, ""),
-                response: responseSchema.allow(null)
-            }).required(),
-            next_failure: responseSchema.required().required(),
+            failure_response: responseSchema.required().required(),
         }).required(),
     })
     return schema.validate(data)
@@ -40,17 +30,17 @@ export const storeSingleConfigSerialValidation = (data: Request): ValidationResu
     const schema = Joi.object({
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
-        next_failure: responseSchema.required().required(),
+        failure_response: responseSchema.required().required(),
     })
     return schema.validate(data)
 }
 
 export const updateSingleConfigSerialValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
-        id : Joi.string().required(),
+        id: Joi.string().required(),
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
-        next_failure: responseSchema.required().required(),
+        failure_response: responseSchema.required().required(),
     })
     return schema.validate(data)
 }
@@ -60,18 +50,22 @@ export const storeSingleCLogicSerialValidation = (data: Request): ValidationResu
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
 
 export const updateSingleCLogicSerialValidation = (data: Request): ValidationResult => {
     const schema = Joi.object({
-        id : Joi.string().required(),
+        id: Joi.string().required(),
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
@@ -80,6 +74,7 @@ export const storeSingleConfigParallelValidation = (data: Request): ValidationRe
     const schema = Joi.object({
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
+        loop: Joi.string().allow(null)
     })
     return schema.validate(data)
 }
@@ -89,7 +84,7 @@ export const updateSingleConfigParallelValidation = (data: Request): ValidationR
         id: Joi.string().required(),
         configure_id: Joi.string().required(),
         alias: Joi.string().required(),
-        loop : Joi.string().allow(null)
+        loop: Joi.string().allow(null)
     })
     return schema.validate(data)
 }
@@ -99,7 +94,9 @@ export const storeSingleCLogicParallelValidation = (data: Request): ValidationRe
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }
@@ -110,7 +107,9 @@ export const updateSingleCLogicParallelValidation = (data: Request): ValidationR
         rule: Joi.object().allow(null),
         data: Joi.object().allow(null),
         next_success: Joi.string().allow(null, ""),
-        response: responseSchema.allow(null)
+        response: responseSchema.allow(null),
+        next_failure: Joi.string().allow(null, ""),
+        failure_response: responseSchema.allow(null)
     })
     return schema.validate(data)
 }

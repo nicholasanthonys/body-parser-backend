@@ -360,7 +360,7 @@ export default class ContainerController {
 
         return await docker.createContainer(
             {
-                Image: "go-single-middleware:1.0",
+                Image: process.env.SINGLE_MIDDLEWARE_IMAGE_NAME,
                 Cmd: ["./build/go-single-middleware"],
                 name: dbContainer._id.toString(),
                 ExposedPorts,

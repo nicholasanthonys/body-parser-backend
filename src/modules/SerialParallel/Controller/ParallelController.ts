@@ -5,7 +5,7 @@ import { ConfigureFileSerial } from 'src/modules/SerialParallel/ConfigureFileSer
 import { CLogic, ICLogic } from 'src/modules/SerialParallel/CLogic'
 import { IStoreParallelDTO, IStoreSingleConfigParallelDTO } from '../DTO/StoreParallelDTO'
 import { IParallel, Parallel } from '../Parallel';
-import { ConfigureFile, IConfigureFile} from '../ConfigureFile';
+import { ConfigureFile, IConfigureFile } from '../ConfigureFile';
 
 import { IUpdateSingleConfigParallelDTO } from '../DTO/UpdateParallelDTO';
 import { IStoreSingleCLogicItemDTO, IUpdateSingleCLogicItemDTO } from '../DTO/CLogicDTO'
@@ -22,7 +22,7 @@ export default class ParallelController {
         }
         project.parallel = new Parallel({
             configures: storeParallelDTO.configures,
-            next_failure: storeParallelDTO.next_failure,
+            failure_response: storeParallelDTO.failure_response,
             c_logics: storeParallelDTO.c_logics
         })
         await project.save();
@@ -35,7 +35,7 @@ export default class ParallelController {
             return null;
         }
         if (project.parallel) {
-            project.parallel.next_failure = new FinalResponse({
+            project.parallel.failure_response = new FinalResponse({
                 status_code: storeNextFailure.status_code,
                 transform: storeNextFailure.transform,
                 adds: storeNextFailure.adds,
@@ -45,19 +45,20 @@ export default class ParallelController {
 
 
             await project.save();
-            return project.parallel?.next_failure
+            return project.parallel?.failure_response
         }
         return null;
     }
 
-    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
+    async storeSingleConfigParallel(storeSingleConfigParallelDTO: IStoreSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile | null | undefined> {
         let project = await this.projectController.show(projectId, userId);
         if (!project) {
             return null;
         }
         project.parallel?.configures.push(new ConfigureFile({
             configure_id: storeSingleConfigParallelDTO.configure_id,
-            alias: storeSingleConfigParallelDTO.alias
+            alias: storeSingleConfigParallelDTO.alias,
+            loop : storeSingleConfigParallelDTO.loop
         }));
 
         await project.save();
@@ -73,14 +74,16 @@ export default class ParallelController {
             rule: storeSingleCLogicParallelDTO.rule,
             data: storeSingleCLogicParallelDTO.data,
             next_success: storeSingleCLogicParallelDTO.next_success,
-            response: storeSingleCLogicParallelDTO.response
+            response: storeSingleCLogicParallelDTO.response,
+            next_failure: storeSingleCLogicParallelDTO.next_failure,
+            failure_response: storeSingleCLogicParallelDTO.failure_response
         }));
 
         await project.save();
         return project.parallel?.c_logics[project.parallel.c_logics.length - 1]
     }
 
-    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile| null | undefined> {
+    async updateSingleConfigParallel(storeSingleConfigParallelDTO: IUpdateSingleConfigParallelDTO, projectId: string, userId: string): Promise<IConfigureFile | null | undefined> {
         let project = await this.projectController.show(projectId, userId);
 
         if (!project) {
@@ -92,7 +95,7 @@ export default class ParallelController {
             if (project.parallel) {
                 project.parallel.configures[index].configure_id = storeSingleConfigParallelDTO.configure_id
                 project.parallel.configures[index].alias = storeSingleConfigParallelDTO.alias,
-                project.parallel.configures[index].loop = storeSingleConfigParallelDTO.loop
+                    project.parallel.configures[index].loop = storeSingleConfigParallelDTO.loop
                 await project.save();
                 return project.parallel.configures[index]
             }
@@ -113,9 +116,11 @@ export default class ParallelController {
         let index = project.parallel?.c_logics.findIndex(e => e._id == updateSingleCLogicParallelDTO.id);
         if (index != undefined && index >= 0) {
             if (project.parallel) {
-                project.parallel.c_logics[index].rule = updateSingleCLogicParallelDTO.rule,
-                    project.parallel.c_logics[index].data = updateSingleCLogicParallelDTO.data,
-                    project.parallel.c_logics[index].next_success = updateSingleCLogicParallelDTO.next_success,
+                project.parallel.c_logics[index].rule = updateSingleCLogicParallelDTO.rule
+                project.parallel.c_logics[index].data = updateSingleCLogicParallelDTO.data
+                project.parallel.c_logics[index].next_success = updateSingleCLogicParallelDTO.next_success
+
+                if (updateSingleCLogicParallelDTO.response) {
                     project.parallel.c_logics[index].response = new FinalResponse({
                         status_code: updateSingleCLogicParallelDTO.response.status_code,
                         transform: updateSingleCLogicParallelDTO.response.transform,
@@ -123,6 +128,25 @@ export default class ParallelController {
                         modifies: updateSingleCLogicParallelDTO.response.modifies,
                         deletes: updateSingleCLogicParallelDTO.response.deletes,
                     })
+
+                } else {
+                    project.parallel.c_logics[index].response = null
+                }
+
+                project.parallel.c_logics[index].next_failure = updateSingleCLogicParallelDTO.next_failure
+                if (updateSingleCLogicParallelDTO.failure_response) {
+                    project.parallel.c_logics[index].failure_response = new FinalResponse({
+                        status_code: updateSingleCLogicParallelDTO.failure_response.status_code,
+                        transform: updateSingleCLogicParallelDTO.failure_response.transform,
+                        adds: updateSingleCLogicParallelDTO.failure_response.adds,
+                        modifies: updateSingleCLogicParallelDTO.failure_response.modifies,
+                        deletes: updateSingleCLogicParallelDTO.failure_response.deletes,
+                    })
+
+                } else {
+                    project.parallel.c_logics[index].failure_response = null
+                }
+
                 await project.save();
                 return project.parallel.c_logics[index]
             }
@@ -155,15 +179,15 @@ export default class ParallelController {
                 project.parallel?.configures.push(configureFile)
             })
 
-            project.parallel.next_failure.status_code = storeParallelDTO.next_failure.status_code
-            project.parallel.next_failure.transform = storeParallelDTO.next_failure.transform
+            project.parallel.failure_response.status_code = storeParallelDTO.failure_response.status_code
+            project.parallel.failure_response.transform = storeParallelDTO.failure_response.transform
 
 
-            project.parallel.next_failure.adds.header = storeParallelDTO.next_failure.adds.header
-            project.parallel.next_failure.adds.body = storeParallelDTO.next_failure.adds.body
+            project.parallel.failure_response.adds.header = storeParallelDTO.failure_response.adds.header
+            project.parallel.failure_response.adds.body = storeParallelDTO.failure_response.adds.body
 
-            project.parallel.next_failure.modifies.header = storeParallelDTO.next_failure.modifies.header
-            project.parallel.next_failure.modifies.body = storeParallelDTO.next_failure.modifies.body
+            project.parallel.failure_response.modifies.header = storeParallelDTO.failure_response.modifies.header
+            project.parallel.failure_response.modifies.body = storeParallelDTO.failure_response.modifies.body
 
             project.parallel.c_logics = [];
             storeParallelDTO.c_logics.forEach(element => {
@@ -171,7 +195,9 @@ export default class ParallelController {
                     rule: element.rule,
                     data: element.data,
                     next_success: element.next_success,
-                    response: element.response
+                    response: element.response,
+                    next_failure: element.next_failure,
+                    failure_response: element.failure_response
                 })
                 project.parallel?.c_logics.push(cLogicItem)
             })

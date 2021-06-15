@@ -7,7 +7,7 @@ import { IFinalResponseConfig } from '../Response';
 
 export interface IParallel extends Document {
     configures: Array<IConfigureFile>
-    next_failure: IFinalResponseConfig
+    failure_response: IFinalResponseConfig
     c_logics: Array<ICLogic>
 }
 
@@ -17,7 +17,7 @@ export const parallelSchema = new Schema({
         required: true,
         default: [],
     },
-    next_failure: {
+    failure_response: {
         type: finalResponseConfigSchema,
         required: true,
         default: {
