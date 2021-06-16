@@ -41,7 +41,7 @@ router.post("/", async (req: Request, res: Response) => {
         try {
             const project = await projectControler.store(storeProjectDTO, user.id)
             return res.status(200).send(project);
-        } catch (err) {
+        } catch (err : any) {
             return res.status(400).send(err.message);
         }
     }
@@ -85,7 +85,7 @@ router.post("/:project_id/serial", async (req: Request, res: Response) => {
         }
 
         return res.status(200).send(serial);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -113,7 +113,7 @@ router.post("/:project_id/serial/config/new", async (req: Request, res: Response
         }
 
         return res.status(200).send(serialConfig);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -142,7 +142,7 @@ router.put("/:project_id/serial/config", async (req: Request, res: Response) => 
         }
 
         return res.status(200).send(serialConfig);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -170,7 +170,7 @@ router.post("/:project_id/serial/config/:config_id/clogic/new", async (req: Requ
         }
 
         return res.status(200).send(cLogic);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -198,7 +198,7 @@ router.put("/:project_id/serial/config/:config_id/clogic", async (req: Request, 
         }
 
         return res.status(200).send(cLogic);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -225,7 +225,7 @@ router.put("/:project_id/serial", async (req: Request, res: Response) => {
             })
         }
         return res.status(200).send(serial);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -268,7 +268,7 @@ router.post("/:project_id/parallel", async (req: Request, res: Response) => {
             })
         }
         return res.status(200).send(parallel);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -295,7 +295,7 @@ router.post("/:project_id/parallel/failure-response", async (req: Request, res: 
             })
         }
         return res.status(200).send(nextFailure);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -321,8 +321,12 @@ router.post("/:project_id/parallel/config/new", async (req: Request, res: Respon
                 message: "No Project found"
             })
         }
+        console.log("config parallel is")
+        console.log(configParallel)
         return res.status(200).send(configParallel);
-    } catch (err) {
+    } catch (err : any) {
+        console.log("error is ")
+        console.log(err)
         return res.status(400).send(err.message);
     }
 });
@@ -349,7 +353,7 @@ router.post("/:project_id/parallel/clogic/new", async (req: Request, res: Respon
             })
         }
         return res.status(200).send(cLogicParallel);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -376,7 +380,7 @@ router.put("/:project_id/parallel", async (req: Request, res: Response) => {
             })
         }
         return res.status(200).send(parallel);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -406,8 +410,8 @@ router.get("/:id", async (req: Request, res: Response) => {
                 );
             }
             return res.status(400).send({ message: "No project found" });
-        } catch (error) {
-            return res.status(400).send({ message: error.message });
+        } catch (err : any) {
+            return res.status(400).send({ message: err.message });
         }
     }
 });
@@ -434,7 +438,7 @@ router.put("/:project_id/parallel/config", async (req: Request, res: Response) =
             })
         }
         return res.status(200).send(configParallel);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -462,7 +466,7 @@ router.put("/:project_id/parallel/clogic", async (req: Request, res: Response) =
             })
         }
         return res.status(200).send(cLogicParallel);
-    } catch (err) {
+    } catch (err : any) {
         return res.status(400).send(err.message);
     }
 });
@@ -483,7 +487,7 @@ router.put("/", async (req: Request, res: Response) => {
             const updatedProject = await projectControler.update(updateProjectDTO)
 
             return res.status(200).send(updatedProject);
-        } catch (err) {
+        } catch (err : any) {
             return res.status(400).send({ message: err.message });
         }
     }
@@ -561,7 +565,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
             return res.status(400).send({ message: "Project not found" });
 
-        } catch (err) {
+        } catch (err : any) {
             return res.status(400).send({ message: err.message() });
         }
     }
