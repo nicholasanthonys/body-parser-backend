@@ -221,7 +221,7 @@ export default class ContainerController {
             console.log("serial json is ")
             console.log(project.serial.toJSON())
             let serialFileName = `${projectDir}/serial.json`
-            jsonfile.writeFile(serialFileName, project.serial.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
+            jsonfile.writeFile(serialFileName, project.serial.toJSON(), { spaces: 2, }, function (err) {
                 if (err) {
                     console.log("error write serial.json is");
                     console.log(err);
@@ -233,7 +233,7 @@ export default class ContainerController {
 
             //* Write base.json
             let baseFileName = `${projectDir}/base.json`
-            jsonfile.writeFile(baseFileName, project.base.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
+            jsonfile.writeFile(baseFileName, project.base.toJSON(), { spaces: 2, }, function (err) {
                 if (err) {
                     console.log("error write base.json is");
                     console.log(err);
@@ -251,7 +251,7 @@ export default class ContainerController {
 
             //* write parallel.json
             let parallelFileName = `${projectDir}/parallel.json`
-            jsonfile.writeFile(parallelFileName, project.parallel.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
+            jsonfile.writeFile(parallelFileName, project.parallel.toJSON(), { spaces: 2,  }, function (err) {
                 if (err) {
                     console.log("error write parallel.json ");
                     console.log(err);
@@ -275,7 +275,7 @@ export default class ContainerController {
 
                 let file = `${projectDir}/${fileName}.json`
 
-                jsonfile.writeFile(file, config.toJSON(), { spaces: 2, replacer: undefined }, function (err) {
+                jsonfile.writeFile(file, config.toJSON(), { spaces: 2 }, function (err) {
                     if (err) {
                         console.log("error  write file configure ");
                         console.log(err);
@@ -343,8 +343,8 @@ export default class ContainerController {
                     };
                     await container.remove();
                 }
-            } catch (error) {
-                throw Error(error)
+            } catch (err : any) {
+                throw Error(err)
             }
         }
 
