@@ -153,7 +153,6 @@ export default class SerialController {
         if (index >= 0) {
             project.serial.configures[index].configure_id = configFileSerialDTO.configure_id;
             project.serial.configures[index].alias = configFileSerialDTO.alias,
-                project.serial.configures[index].c_logics = [],
                 project.serial.configures[index].failure_response = new FinalResponse({
                     status_code: configFileSerialDTO.failure_response.status_code,
                     transform: configFileSerialDTO.failure_response.transform,
