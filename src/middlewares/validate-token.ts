@@ -11,10 +11,10 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
     if (decoded) {
       next(); // to continue the flow
     } else {
-      next(new HttpException(403, "Token is not valid"));
+      return next(new HttpException(403, "Token is not valid"));
     }
   } else {
-    next(new HttpException(401, "Access denied"));
+    return next(new HttpException(401, "Access denied"));
   }
 };
 
