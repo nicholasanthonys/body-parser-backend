@@ -24,7 +24,7 @@ export default class SerialController {
     storeSerialDTO: IStoreSerialDTO,
     projectId: string,
     userId: string
-  ): Promise<ISeria> {
+  ): Promise<ISerial> {
     let project = await this.projectController.show(projectId, userId);
     if (!project) {
       throw new Error("Project not found");
