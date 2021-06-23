@@ -73,6 +73,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     if (err instanceof Error) {
       return next(new BadRequestException(err.message));
     }
+    return next(new BadRequestException('Something happened'));
   }
 });
 
@@ -92,6 +93,8 @@ router.get(
       if (err instanceof Error) {
         return next(new BadRequestException(err.message));
       }
+      return next(new BadRequestException('Something happened'));
+
     }
   }
 );
@@ -121,6 +124,8 @@ router.post(
       if (err instanceof Error) {
         return next(new BadRequestException(err.message));
       }
+      return next(new BadRequestException('Something happened'));
+
     }
   }
 );
