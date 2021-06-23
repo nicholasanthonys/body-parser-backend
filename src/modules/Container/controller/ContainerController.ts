@@ -34,10 +34,7 @@ export default class ContainerController {
     }).sort({ date: "desc" });
   }
 
-  async find(
-    dbContainerId: string,
-    userId: string
-  ): Promise<IContainer | null> {
+  async find(dbContainerId: string, userId: string): Promise<IContainer> {
     let dbContainer = await ContainerModel.findOne({
       _id: dbContainerId,
       user_id: userId,
@@ -45,7 +42,7 @@ export default class ContainerController {
     if (dbContainer) {
       return dbContainer;
     }
-    return null;
+    throw new Error("DbContainer not found");
   }
 
   async show(dbContainerId: string, userId: string): Promise<IContainerCustom> {
@@ -187,10 +184,7 @@ export default class ContainerController {
     return state;
   }
 
-  async writeContainerProjects(
-    dbContainerId: string,
-    userId: string
-  )  {
+  async writeContainerProjects(dbContainerId: string, userId: string) {
     let dbContainer = (await ContainerModel.findOne({
       _id: dbContainerId,
       user_id: userId,
@@ -212,7 +206,6 @@ export default class ContainerController {
 
     shell.mkdir("-p", dir);
 
-
     projects.forEach(async (project) => {
       //* Create container for each project
       shell.mkdir("-p", dir + `/${project._id}`);
@@ -229,7 +222,7 @@ export default class ContainerController {
             console.log("error write serial.json is");
             console.log(err);
             operationError = err;
-            throw Error(err.message);
+            throw new Error(err.message);
           }
         }
       );
@@ -245,7 +238,7 @@ export default class ContainerController {
             console.log("error write base.json is");
             console.log(err);
             operationError = err;
-            throw Error(err.message);
+            throw new Error(err.message);
           }
         }
       );
@@ -253,7 +246,7 @@ export default class ContainerController {
       if (operationError) {
         console.log("error write serial.json");
         console.log(operationError);
-        throw Error(operationError.message);
+        throw new Error(operationError.message);
       }
 
       //* write parallel.json
@@ -267,7 +260,7 @@ export default class ContainerController {
             console.log("error write parallel.json ");
             console.log(err);
             operationError = err;
-            throw Error(err.message);
+            throw new Error(err.message);
           }
         }
       );
@@ -275,7 +268,7 @@ export default class ContainerController {
       if (operationError) {
         console.log("error write parallel.json");
         console.log(operationError);
-        throw Error(operationError);
+        throw new Error(operationError);
       }
 
       // * Write configure-n.json for each configures
@@ -294,7 +287,7 @@ export default class ContainerController {
               console.log("error  write file configure ");
               console.log(err);
               operationError = err;
-              throw Error(err.message);
+              throw new Error(err.message);
             }
           }
         );
@@ -304,7 +297,7 @@ export default class ContainerController {
     if (operationError) {
       console.log("error write each config project");
       console.log(operationError);
-      throw Error(operationError);
+      throw new Error(operationError);
     }
 
     // //* write router
@@ -357,7 +350,7 @@ export default class ContainerController {
           await container.remove();
         }
       } catch (err: any) {
-        throw Error(err);
+        throw new Error(err);
       }
     }
 
@@ -399,7 +392,7 @@ export default class ContainerController {
       .catch((error) => {
         console.log("error when creating container");
         console.log(error);
-        throw Error(error);
+        throw new Error(error);
       });
   }
 
