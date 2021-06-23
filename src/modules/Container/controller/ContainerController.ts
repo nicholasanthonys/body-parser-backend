@@ -190,7 +190,7 @@ export default class ContainerController {
   async writeContainerProjects(
     dbContainerId: string,
     userId: string
-  ): Promise<NodeJS.ErrnoException> {
+  )  {
     let dbContainer = (await ContainerModel.findOne({
       _id: dbContainerId,
       user_id: userId,
@@ -326,7 +326,6 @@ export default class ContainerController {
       console.log("error write router");
       return operationError;
     }
-    return null;
   }
 
   async createContainer(dbContainer: IContainer): Promise<Docker.Container> {
