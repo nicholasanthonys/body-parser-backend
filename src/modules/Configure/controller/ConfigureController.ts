@@ -15,7 +15,7 @@ export default class ConfigureController {
   async store(
     storeConfigureDTO: IStoreConfigureDTO,
     userId: string
-  ): Promise<IConfig | null> {
+  ): Promise<IConfig> {
     const project = (await Project.findOne({
       _id: storeConfigureDTO.project_id,
       userId,
@@ -33,11 +33,11 @@ export default class ConfigureController {
       await project.save();
       return newConfig;
     }
-    return null;
+    throw new Error("Project not found");
   }
 
   //* Get configures by project ids
-  async getAll(projectId: string, userId: string): Promise<IConfigure | null> {
+  async getAll(projectId: string, userId: string): Promise<IConfigure> {
     const project = (await Project.findOne({
       _id: projectId,
       userId,
@@ -45,7 +45,7 @@ export default class ConfigureController {
     if (project) {
       return project.configures;
     }
-    return null;
+    throw new Error("Project not found");
   }
 
   async show(
@@ -150,14 +150,10 @@ export default class ConfigureController {
         return updatedProject.configures.configs[index];
       }
     }
-    return null;
+    throw new Error("Project not found");
   }
 
-  async delete(
-    projectId: string,
-    configureId: string,
-    userId: string
-  ): Promise<boolean> {
+  async delete(projectId: string, configureId: string, userId: string) {
     const project = (await Project.findOne({
       _id: projectId,
       userId,
@@ -167,16 +163,15 @@ export default class ConfigureController {
         (element) => element._id != configureId
       );
       await project.save();
-      return true;
     }
-    return false;
+    throw new Error("Project not found");
   }
 
   async storeSingleCLogicRequest(
     storeSingleCLogicRequestDTO: IStoreRequestSingleCLogicItemDTO,
     configureId: string,
     userId: string
-  ): Promise<ICLogic | null | undefined> {
+  ): Promise<ICLogic> {
     const project = (await Project.findOne({
       _id: storeSingleCLogicRequestDTO.project_id,
       userId,
@@ -208,15 +203,14 @@ export default class ConfigureController {
         ];
       }
     }
-
-    return null;
+    throw new Error("Project not found");
   }
 
   async updateSingleCLogicRequest(
     updateSingleCLogicRequestDTO: IUpdateConfigureSingleCLogicItemDTO,
     userId: string,
     configureId: string
-  ): Promise<ICLogic | null | undefined> {
+  ): Promise<ICLogic> {
     const project = (await Project.findOne({
       _id: updateSingleCLogicRequestDTO.project_id,
       userId,
@@ -295,10 +289,8 @@ export default class ConfigureController {
           ];
         }
       }
-    } else {
-      console.log("project not found");
     }
-    return null;
+    throw new Error("Project not found");
   }
 
   async deleteCLogic(
@@ -306,27 +298,24 @@ export default class ConfigureController {
     userId: string,
     configId: string,
     cLogicId: string
-  ): Promise<boolean> {
+  ) {
     const project = (await Project.findOne({
       _id: projectId,
       userId,
     })) as IProject;
     if (!project) {
-      return false;
+      throw new Error("Project not found");
     }
     let index = project.configures.configs.findIndex(
       (element) => element._id == configId
     );
-    console.log("config id is ");
-    console.log(configId);
     if (index >= 0) {
       project.configures.configs[index].request.c_logics =
         project.configures.configs[index].request.c_logics.filter(
           (cLogic) => cLogic._id != cLogicId
         );
       await project.save();
-      return true;
     }
-    return false;
+    throw new Error("Config not found");
   }
 }
