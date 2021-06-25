@@ -20,7 +20,7 @@ export const baseSchema = new Schema({
         type: finalResponseConfigSchema,
         required: true,
         default: {
-            status_code: 200,
+            status_code: 508,
             transform: "ToJson",
             log_before_modify: {},
             log_after_modify: {},
