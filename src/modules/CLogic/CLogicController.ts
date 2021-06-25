@@ -10,13 +10,13 @@ export default class CLogicController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.parallel.c_logics = project.parallel.c_logics.filter(
-        (c) => c._id != cLogicId
-      );
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Project not found");
+    project.parallel.c_logics = project.parallel.c_logics.filter(
+      (c) => c._id != cLogicId
+    );
+    await project.save();
   }
 
   async deleteCLogicSerial(
@@ -29,18 +29,18 @@ export default class CLogicController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      let configIndex = project.serial.configures.findIndex(
-        (config) => config._id == configId
-      );
-      if (configIndex >= 0) {
-        project.serial.configures[configIndex].c_logics =
-          project.serial.configures[configIndex].c_logics.filter(
-            (c) => c._id != cLogicId
-          );
-      }
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Project not found");
+    let configIndex = project.serial.configures.findIndex(
+      (config) => config._id == configId
+    );
+    if (configIndex >= 0) {
+      project.serial.configures[configIndex].c_logics =
+        project.serial.configures[configIndex].c_logics.filter(
+          (c) => c._id != cLogicId
+        );
+    }
+    await project.save();
   }
 }

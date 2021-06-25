@@ -158,13 +158,13 @@ export default class ConfigureController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.configures.configs = project.configures.configs.filter(
-        (element) => element._id != configureId
-      );
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Project not found");
+    project.configures.configs = project.configures.configs.filter(
+      (element) => element._id != configureId
+    );
+    await project.save();
   }
 
   async storeSingleCLogicRequest(

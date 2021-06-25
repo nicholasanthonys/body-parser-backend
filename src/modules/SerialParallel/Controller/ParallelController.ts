@@ -262,10 +262,10 @@ export default class ParallelController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.parallel.delete();
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Projec not found");
+    project.parallel.delete();
+    await project.save();
   }
 }

@@ -77,11 +77,11 @@ export default class ProjectController {
 
   async delete(id: string, userId: string) {
     const project = await Project.findOne({ _id: id, userId });
-    if (project) {
+    if(!project){
+      throw new Error("Project not found");
+    }
       await Project.deleteOne({ _id: id, userId });
       //* Delete related configures
       await Configure.deleteMany({ projectId: project._id });
-    }
-    throw new Error("Project not found");
   }
 }

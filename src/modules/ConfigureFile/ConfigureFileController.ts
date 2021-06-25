@@ -10,13 +10,13 @@ export default class ConfigureFileController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.parallel.configures = project.parallel.configures.filter(
-        (c) => c._id != configureFileId
-      );
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Project not found");
+    project.parallel.configures = project.parallel.configures.filter(
+      (c) => c._id != configureFileId
+    );
+    await project.save();
   }
 
   async deleteConfigureFileSerial(
@@ -28,12 +28,12 @@ export default class ConfigureFileController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.serial.configures = project.serial.configures.filter(
-        (c) => c._id != configureFileId
-      );
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("Project not found");
+    project.serial.configures = project.serial.configures.filter(
+      (c) => c._id != configureFileId
+    );
+    await project.save();
   }
 }

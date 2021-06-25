@@ -264,10 +264,10 @@ export default class SerialController {
       _id: projectId,
       userId,
     })) as IProject;
-    if (project) {
-      project.serial.delete();
-      await project.save();
+    if (!project) {
+      throw new Error("Project not found");
     }
-    throw new Error("project not found");
+    project.serial.delete();
+    await project.save();
   }
 }
