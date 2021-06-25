@@ -10,7 +10,6 @@ import {
   IUpdateSingleCLogicItemDTO,
 } from "src/modules/SerialParallel/DTO/CLogicDTO";
 import CLogicController from "src/modules/CLogic/CLogicController";
-import ConfigureFileController from "src/modules/ConfigureFile/ConfigureFileController";
 import ForbiddenException from "src/exceptions/ForbiddenException";
 import InvalidRequestException from "src/exceptions/InvalidRequest";
 import BadRequestException from "src/exceptions/BadRequestException";
