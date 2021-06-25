@@ -21,7 +21,7 @@ export const parallelSchema = new Schema({
         type: finalResponseConfigSchema,
         required: true,
         default: {
-            status_code: '',
+            status_code: 400,
             transform:
                 "ToJson",
 
