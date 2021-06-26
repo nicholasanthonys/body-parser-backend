@@ -15,6 +15,7 @@ import projectRoute from './routes/projects';
 import configureRoute from './routes/configures';
 import containerRoute from './routes/container';
 import imageRouter from './routes/image';
+import errorHandler from './middlewares/error-handler';
 
 //* load environment variable
 dotenv.config();
@@ -55,7 +56,8 @@ app.use(`${prefixRoute}/user`, userRoute);
 app.use(`${prefixRoute}/project`, projectRoute);
 app.use(`${prefixRoute}/configure`, configureRoute);
 app.use(`${prefixRoute}/container`, containerRoute);
-
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
+
+app.use(errorHandler)
