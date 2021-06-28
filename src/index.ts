@@ -16,9 +16,17 @@ import configureRoute from './routes/configures';
 import containerRoute from './routes/container';
 import imageRouter from './routes/image';
 import errorHandler from './middlewares/error-handler';
+import path from 'path';
 
 //* load environment variable
-dotenv.config();
+const envName = process.env.NODE_ENV == 'testing' ? '.env.testing' : '.env'
+const pathEnv = path.resolve(__dirname, `../${envName}`)
+dotenv.config({
+  path: pathEnv
+}); 
+
+
+console.log(pathEnv)
 
 //* Get Port from env
 const port = process.env.PORT || 5000
@@ -27,7 +35,7 @@ const port = process.env.PORT || 5000
 
 
 //* connect to mongodb
-connectToMongo();
+connectToMongo(process.env.DB_CONNECT!);
 
 const app: Application = express();
 

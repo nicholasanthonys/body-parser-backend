@@ -1,6 +1,7 @@
 // Put your env variable here to get strongly typed
 declare namespace NodeJS {
     export interface ProcessEnv {
+        NODE_ENV : string
         DB_CONNECT:string 
         PORT:string
         ACCESS_TOKEN_SECRET:Secret        

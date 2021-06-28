@@ -1,12 +1,10 @@
 
 import mongoose from 'mongoose'
-import dotenv from 'dotenv';
-dotenv.config();
-const DB_CONNECT = process.env.DB_CONNECT;
-export const connectToMongo = async () => {
+export const connectToMongo = async (mongoURI : string) => {
+    console.log(`connect to mongo URI :${mongoURI} `)
     try {
         await mongoose.connect(
-            `${DB_CONNECT}`, // Use template string otherwise this will be error
+            `${mongoURI}`, // Use template string otherwise this will be error
             {
                 useFindAndModify: false,
                 useNewUrlParser: true,
